@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, "../../shared")
+
 import asyncio
 
 import utils

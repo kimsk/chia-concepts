@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, "../../shared")
+
 from blspy import (PrivateKey, AugSchemeMPL, G1Element, G2Element)
 
 from chia.types.condition_opcodes import ConditionOpcode

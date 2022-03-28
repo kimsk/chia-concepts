@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, "../../shared")
+
 from blspy import (PrivateKey, AugSchemeMPL, G1Element, G2Element)
 from chia.consensus.default_constants import DEFAULT_CONSTANTS
 from chia.types.blockchain_format.program import Program

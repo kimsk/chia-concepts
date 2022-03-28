@@ -1,0 +1,5 @@
+include/
+main.sym
+*.clsp.hex
+__pycache__
+.vscode
