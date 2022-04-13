@@ -35,8 +35,7 @@ The most well-known singleton example is the [plot nft](https://github.com/Chia-
 Anything that needs to be unique on the blockchain can also be represented by a singleton.
 
 - NFT (Non-Fungible Token) 
-- DIDs () : A parent singleton can be treated as DID. [Mainnet Anniversary AMA](https://youtu.be/8tXkrMs1flg?t=3206), [ChiaLisp & Decentralized Identity](https://www.youtube.com/watch?v=zAG9KeMTZw8)
-
+- DIDs (Decentralized Identifiers) : A parent singleton can be treated as DID.
 
 ## How it works?
 
@@ -47,7 +46,9 @@ To ensure that the coin is unique, when a singleton coin is spent, it creates an
 - Only one output (i.e., a singleton) coin can have an odd value.
 - All singletons should have the same format.
 
-### Bootstrapping
+## Bootstrapping
+
+So we have set up the rules for our singleton puzzle. However, how we can create one and only-one singleton coin?
 
 > We need to ensure that only one singleton is created with the same ID. This is surprisingly difficult. The crux of the issue is that we have no control over the coin that creates the singleton. 
 
@@ -60,22 +61,28 @@ To ensure that the coin is unique, when a singleton coin is spent, it creates an
 - To make sure that the `singleton_puzzle_hash` is not tampered, we will utilize annoucement.
 - The standard coin creates the launcher coin and assert the announcement from the same launcher coin that is spent at the same time. The launcher coin is an ephemeral coin.
 
-`launcher_coin_id` can be derived from the standard coin id which is the `parent_coin_id` and `launcher_puzzle_hash` and `amount`. Then the standard coin can assert that there is an announcement from the ephemeral launcher coin with **the expected** `singleton_puzzle_hash`. If the launcher coin doesn't create the coin with **the expected** `singleton_puzzle_hash`, the standard coin is not even spend and the launcher coin never exists!
+### Standard Coin Spend Conditions
+> Usually, the parent is going to be a standard coin. In the standard coin, we sign the puzzle that makes the conditions. If we create an `ASSERT_COIN_ANNOUNCEMENT` condition, we implicitly sign that too. -- [The Launcher](https://chialisp.com/docs/puzzles/singletons/#the-launcher)
 
-`launcher_puzzle_reveal` is the [standard launcher](https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/singleton_launcher.clvm). `solution` includes `singleton_puzzle_hash`.
+- `launcher_coin_id` can be derived from the standard coin id which is the `parent_coin_id` and `launcher_puzzle_hash` and `amount`. 
+- The standard coin asserts that there is an announcement from the **ephemeral launcher coin** with **the expected** `singleton_puzzle_hash`.
 
-
-#### Standard Coin Spend Conditions
 ```lisp
 (CREATE_COIN launcher_puzzle_hash)
-(ASSERT_COIN_ANNOUNCEMENT sha256(launcher_coin_id + singleton_puzzle_hash))
+(ASSERT_COIN_ANNOUNCEMENT sha256(launcher_coin_id + (sha256tree (singleton_full_puzzle_hash amount key_value_list))))
 (AGG_SIG_ME owner_pubkey my_solution)
 ```
-#### Launcher Coin Spend Conditions
+### Launcher Coin Spend Conditions
+- `launcher_puzzle_reveal` is the [standard launcher](https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/singleton_launcher.clvm). `solution` includes `singleton_puzzle_hash`, `amount`, and `key_value_list`.
+
+> The last thing to note is the seemingly useless key_value_list that is passed in as an argument and announced. The purpose for this is to communicate information to blockchain observers. Sometimes you want to be able to know information about a puzzle before it is revealed. The only way we can get this information on chain is from the parent's puzzle reveal so sometimes it is useful to have useless parameters be part of the solution in order to make it easier to follow the puzzle's on chain state. Remember that you pay cost for every byte though so keep it concise.  -- [The Launcher](https://chialisp.com/docs/puzzles/singletons/#the-launcher)
+
 ```lisp
-(CREATE_COIN singleton_puzzle_hash)
-(CREATE_COIN_ANNOUCEMENT singleton_puzzle_hash)
+(CREATE_COIN singleton_full_puzzle_hash amount)
+(CREATE_COIN_ANNOUNCEMENT (sha256tree (singleton_full_puzzle_hash amount key_value_list)))
 ```
+
+> If the launcher coin doesn't create the coin with **the expected** `singleton_puzzle_hash`, the standard coin is not even spend and the launcher coin never exists!
 
 ### Singleton Coin
 
@@ -89,7 +96,30 @@ It's very important to know that the puzzle hash from the inner puzzle will be u
 
 #### Truths
 
+The singleton layer already verify the followings:
 
+- The coin's id
+- The coin's puzzle hash
+- The coin's inner puzzle hash
+- The coin's amount
+- The coin's lineage proof
+- The coin's singleton information:
+    - The singleton's code
+    - The launcher's code 
+    - The launcher's id
+
+> The new Singleton 1.1 standard removed Truths because it was originally an optimization, but was causing headaches. [New Singleton 1.1 Standard Top Layer](https://developers.chia.net/t/new-singleton-1-1-standard-top-layer/387)
+
+#### State
+
+We can track the sington coin via launcher id and tracing the odd outputs every time it's spent on the blockchain. The idea is to store the state inside the inner puzzle of the singleton coin which is usually a puzzle hash that must be inferred.
+
+Singleton also has key-value pairs in a list that can be secured with annoucement. We could observe the spend and check the solution.
+
+#### Bonus
+- Nested Inner Puzzles
+- Payment to Singletons
+    - We can make payments to singletons by creating a puzzle that knows the launcher ID of our singleton and requires an annoucement from our singleton in order to be spent.
 
 
 
@@ -111,7 +141,7 @@ It's very important to know that the puzzle hash from the inner puzzle will be u
 To implement "state" in a coin set model, Chia has a singleton puzzle which can be used to wrap any puzzle while maintaining properties of pure functional programming paradigm like immutability (a new state is a new coin and not the update of the existing coin). 
 
 
-## References
+# References
 
 - [What is a singleton?](https://developers.chia.net/t/what-is-a-singleton/87)
 - [Can you store state on the network?](https://developers.chia.net/t/can-you-store-state-on-the-network/84)
