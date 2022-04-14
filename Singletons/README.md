@@ -43,7 +43,7 @@ To ensure that the coin is unique, when a singleton coin is spent, it creates an
 
 ### Rules of Singleton
 - A singleton must have an odd mojo value.
-- Only one output (i.e., a singleton) coin can have an odd value.
+- Only one output (i.e., a singleton) coin can have an odd mojo value.
 - All singletons should have the same format.
 
 ## Bootstrapping
@@ -91,6 +91,84 @@ So we have set up the rules for our singleton puzzle. However, how we can create
 - The singleton layer guarantees uniqueness by verifying odd value mojo rule.
 - The inner puzzle provides customized behavior.
 
+#### 0. solution
+
+```lisp
+(list
+    SINGLETON_STRUCT; (MOD_HASH . (LAUNCHER_ID . LAUNCHER_PUZZLE_HASH))
+    INNER_PUZZLE
+    lineage_proof
+    my_amount
+    inner_solution
+)
+```
+
+##### `lineage_proof`
+```lisp
+(parent_parent_coin_info parent_inner_puzzle_hash parent_amount)
+; or
+(parent_parent_coin_info parent_amount) ; eve spend
+```
+
+
+```lisp
+(defun-inline is_not_eve_proof (lineage_proof) (r (r lineage_proof)))
+```
+
+```sh
+# not eve spend
+❯ brun '(r (r 1))' '(0xdeadbeef 0xcafef00d 1_001)'
+(1001)
+
+# eve spend
+❯ brun '(r (r 1))' '(0xdeadbeef 1_001)'
+()
+```
+
+
+
+[singleton_top_layer_v1_1.clvm](https://github.com/Chia-Network/chia-blockchain/blob/optimize_singleton_v1.1/chia/wallet/puzzles/singleton_top_layer_v1_1.clvm)
+
+#### 1. verify `my_amount` is an odd value
+
+> `logand` (logand A B ...) bitwise AND of one or more atoms. Identity is -1.
+
+> constant ONE == 1 (imported from [curry-and-treehash.clinc](https://github.com/Chia-Network/chia-blockchain/blob/optimize_singleton_v1.1/chia/wallet/puzzles/curry-and-treehash.clinc#L6))
+
+```lisp
+  ; main
+
+  ; if our value is not an odd amount then we are invalid
+  ; this calculates my_innerpuzhash and passes all values to stager_one
+  (if (logand my_amount ONE)
+    (stager_one SINGLETON_STRUCT lineage_proof (sha256tree1 INNER_PUZZLE) my_amount INNER_PUZZLE inner_solution)
+    (x)
+  )
+```
+
+#### 2. staggers
+
+> The purpose of these functions is to calculate values that are used multiple times only once.
+
+##### `stagger_one`
+- calculate `full puzzle hash`
+
+##### `stagger_two`
+- calculate `coin ID`
+    - if not an eve spend, create a new `coin ID`
+    - if eve spend, verify `launcher ID` & `launcher puzzle hash`from the curried in `SINGLETON_STRUCT` are correct
+
+> The first if statement checks if lineage_proof indicates that this is not the eve spend (three proof elements instead of two). If it is not the eve spend, it calculates our ID using the information in the lineage_proof to generate our parent ID.
+
+> If it is the eve spend, there is an extra check which verifies that the launcher ID and launcher puzzle hash we have (both inside the SINGLETON_STRUCT) are correct. 
+
+##### `stagger_three`
+- generate conditions
+    - `ASSERT_MY_COIN_ID my_coin_id` (make sure it's correct coin to be spent)
+    - `check_and_morph_conditions_for_singleton` check the conditions generated from evaluation of `inner puzzle` and `inner solutions` for singleton specific things:
+        - only one odd output
+        - wrap the child singleton
+
 #### Wrapped Puzzle Hash
 It's very important to know that the puzzle hash from the inner puzzle will be updated (the new puzzle hash is called wrapped puzzle hash) by the singleton layer to be the new singleton coin. Also, the inner puzzle also should have no idea about being inside the singleton. 
 
@@ -118,7 +196,7 @@ Singleton also has key-value pairs in a list that can be secured with annoucemen
 
 #### Bonus
 - Nested Inner Puzzles
-- Payment to Singletons
+- [Payment to Singletons](https://chialisp.com/docs/puzzles/singletons#pay-to-singleton)
     - We can make payments to singletons by creating a puzzle that knows the launcher ID of our singleton and requires an annoucement from our singleton in order to be spent.
 
 
@@ -149,3 +227,6 @@ To implement "state" in a coin set model, Chia has a singleton puzzle which can 
 - [Singletons and Ethereum-like Contracts in Chia | Chialisp](https://www.youtube.com/watch?v=kA0l9n5SEI8)
 - [Official Pooling Protocol Launched](https://www.chia.net/2021/07/07/official-pooling-launched.en.html)
 - [Using the EVM to simplify Chia Pools](https://medium.com/liquidum-network/using-the-evm-to-simplify-chia-pools-d5bd696411c3)
+- [New Singleton 1.1 Standard Top Layer](https://developers.chia.net/t/new-singleton-1-1-standard-top-layer/387)
+- [singleton_top_layer.py](https://github.com/Chia-Network/chia-blockchain/blob/optimize_singleton_v1.1/chia/wallet/puzzles/singleton_top_layer.py)
+- [`logand`](https://chialisp.com/docs/ref/clvm#bit-operations)

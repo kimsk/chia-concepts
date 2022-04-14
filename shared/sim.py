@@ -6,6 +6,7 @@ from chia.consensus.default_constants import DEFAULT_CONSTANTS
 from chia.types.blockchain_format.program import Program
 from chia.types.blockchain_format.sized_bytes import bytes32
 from chia.types.coin_spend import CoinSpend
+from chia.types.coin_record import CoinRecord
 from chia.types.condition_opcodes import ConditionOpcode
 from chia.types.spend_bundle import SpendBundle
 
@@ -15,13 +16,13 @@ network: Network = asyncio.run(Network.create())
 asyncio.run(network.farm_block())
 
 alice: Wallet = network.make_wallet("alice")
-print(f'alice pk:\t{alice.pk()}')
+#print(f'alice pk:\t{alice.pk()}')
 bob: Wallet = network.make_wallet("bob")
-print(f'bob pk:\t\t{bob.pk()}')
+#print(f'bob pk:\t\t{bob.pk()}')
 charlie: Wallet = network.make_wallet("charlie")
-print(f'charlie pk:\t{charlie.pk()}')
+#print(f'charlie pk:\t{charlie.pk()}')
 dan: Wallet = network.make_wallet("dan")
-print(f'dan pk:\t\t{dan.pk()}')
+#print(f'dan pk:\t\t{dan.pk()}')
 
 
 def farm(farmer: Wallet):
@@ -42,6 +43,12 @@ def end():
 
 def get_coin_by_puzzle_hash(puzzle_hash):
     return asyncio.run(network.sim_client.get_coin_records_by_puzzle_hash(puzzle_hash))
+
+def get_coin_by_coin_id(coin_id):
+    return asyncio.run(network.sim_client.get_coin_record_by_name(coin_id))
+
+def pass_blocks(number):
+    network.sim.pass_blocks(number)
 
 def get_normal_coin_spend(wallet: Wallet, coin, conditions):
     assert coin != None
