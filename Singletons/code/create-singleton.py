@@ -11,7 +11,12 @@ from chia.types.spend_bundle import SpendBundle
 from chia.util.hash import std_hash
 from chia.wallet.lineage_proof import LineageProof
 import chia.wallet.puzzles.singleton_top_layer as singleton_puzzles
-from chia.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import DEFAULT_HIDDEN_PUZZLE_HASH, calculate_synthetic_secret_key, puzzle_for_public_key_and_hidden_puzzle_hash
+from chia.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import (
+    DEFAULT_HIDDEN_PUZZLE_HASH, 
+    calculate_synthetic_secret_key, 
+    puzzle_for_public_key_and_hidden_puzzle_hash,
+    solution_for_hidden_puzzle
+)
 from clvm.casts import int_to_bytes
 from clvm_tools.clvmc import compile_clvm_text
 
@@ -20,37 +25,51 @@ import utils
 
 
 sim.farm(sim.alice)
+#   ,------------.
+#   | Coin A     |
+#   `------------'
+#         |
+#  ------------------ Atomic Transaction 1 -----------------
+#         v
+#   .------------.       .-------------------------------.
+#   | Launcher   |------>| Eve Coin Containing Program I |
+#   `------------'       `-------------------------------'
 
-amt = 1_000_000
-start_amt = 1_023
-# 1) Designate some coin as coin A
-alice_coin = sim.get_coin(sim.alice, amt)
+
+# Consider that you have some coin A that you want to create a singleton
+# containing some inner puzzle I from with amount T.  We'll call the Launcher
+# coin, which is created from A "Launcher" and the first iteration of the
+# singleton, called the "Eve" spend, Eve.  When spent, I yields a coin
+# running I' and so on in a singleton specific way described below.
+T = 1023
+alice_coin = sim.get_coin(sim.alice, T)
 assert alice_coin != None
-print(f'alice coin:\t{alice_coin}')
 
 inner_clsp = '''
-( mod ()
+(mod (singleton_amt my_amt to_puzhash)
     (include condition_codes.clib)
-    (defconstant BOB_PUZHASH 0x{bob_puzhash})
 
     (list
-        (list CREATE_COIN BOB_PUZHASH {amt})
+        (list CREATE_COIN to_puzhash singleton_amt)
+        (list CREATE_COIN to_puzhash (- my_amt singleton_amt))
+        (list ASSERT_MY_AMOUNT my_amt)
     )
 )
-'''.format(
-    bob_puzhash=sim.bob.puzzle_hash, 
-    amt=start_amt)
+'''
 
-print(inner_clsp)
-
-inner_puzzle: Program = Program(
+I = singleton_puzzles.adapt_inner_to_singleton(Program(
     compile_clvm_text(inner_clsp, search_paths=["./include"])
-)
+))
+
+# 1) Designate some coin as coin A
+A = alice_coin.as_coin()
 
 # 2) call puzzle_for_singleton with that coin's name (it is the Parent of the
 #    Launch coin), and the initial inner puzzle I, curried as appropriate for
 #    its own purpose. Adaptations of the program I and its descendants are
 #    required as below.
+Launcher = singleton_puzzles.generate_launcher_coin(A, T)
+singleton_puzzle = singleton_puzzles.puzzle_for_singleton(Launcher.name(), I)
 
 # 3) call launch_conditions_and_coinsol to get a set of "launch_conditions",
 #    which will be used to spend standard coin A, and a "spend", which spends
@@ -58,100 +77,127 @@ inner_puzzle: Program = Program(
 #    spend. These actions must be done in the same spend bundle.
 launch_conditions, launcher_coin_spend = singleton_puzzles.launch_conditions_and_coinsol(
     alice_coin,
-    inner_puzzle,
-    Program.to([]),
-    start_amt)
-
-
-print(f'launch_conditions:\t{launch_conditions}')
-# (51 0xeff07522495060c066f66f32acc2a77e3a3e737aca8baea4d1a64ea4cdc13da9 1023)
-# (61 0x413445ff6a343415e9e77127ba3feab87f648fe677da466625b2a8c0d0ccfff5)
-print(f'launcher_coin_spend:\t{launcher_coin_spend}')
-# solution:
-# (singleton_full_puzzle_hash amount key_value_list)
-# (0x4b5bf198c591a5902abf71bb4c998233030c3a5be45360ccabacbb4a584aad67 1023 ())
+    I,
+    Program.to([]), # comment
+    T
+)
 
 #    One can create a SpendBundle containing the spend of A giving it the
 #    argument list (() (q . launch_conditions) ()) and then append "spend" onto
 #    its .coin_spends to create a combined spend bundle.
 delegated_puzzle_solution = Program.to((1, launch_conditions))
-alice_coin_spend = CoinSpend(
-            alice_coin.as_coin(),
-            sim.alice.puzzle,
-            Program.to([[], delegated_puzzle_solution, []])
-        )
+A_coin_spend = CoinSpend(
+    A,
+    puzzle_for_public_key_and_hidden_puzzle_hash(
+        sim.alice.pk(), DEFAULT_HIDDEN_PUZZLE_HASH
+    ),
+    Program.to([[], delegated_puzzle_solution, []])
+)
 synthetic_sk: PrivateKey = calculate_synthetic_secret_key(
     sim.alice.sk_,
     DEFAULT_HIDDEN_PUZZLE_HASH
 )
-alice_coin_spend_sig = AugSchemeMPL.sign(synthetic_sk,
+A_coin_spend_sig = AugSchemeMPL.sign(synthetic_sk,
     (
         delegated_puzzle_solution.get_tree_hash()
-        + alice_coin.name()
+        + A.name()
         + DEFAULT_CONSTANTS.AGG_SIG_ME_ADDITIONAL_DATA
     )
 )
 
 spend_bundle = SpendBundle(
     [
-        alice_coin_spend,
+        A_coin_spend,
         launcher_coin_spend
     ],
-    alice_coin_spend_sig,
+    A_coin_spend_sig,
 )
 
+print(f'T: {T}\n')
+print(f'I: {I}\n')
+print(f'A:\n{A.name()}\n{A}\n')
+print(f'Launcher:\n{Launcher.name()}\n{Launcher}\n')
+print(f'Create Singleton Spend Bundle:\n{spend_bundle}')
+
+# A's conditions:
+#   (AGG_SIG_ME 0xa042c855d234578415254b7870b711fb25e8f85beaa4a66bd0673d394c761fa156406c2e3bb375d5b18766d2a12cc918 0x31603f83103be735370fa93e02b8e4ed9fdc12d859c756597f964d287a4985a5)
+#   (CREATE_COIN 0xeff07522495060c066f66f32acc2a77e3a3e737aca8baea4d1a64ea4cdc13da9 0x0f42bb)
+#   (ASSERT_COIN_ANNOUNCEMENT 0x168887c50fb7175284d0ea9b894e3e78a7cff58afdade103d7c79bbcf2f98c46)
+# Launcher's conditions:
+#   (CREATE_COIN 0xc2571cd93ef0c4f1bfc8d0b7c4d5eeb091f38bf1ad7831083108d1bcf4d54df0 0x0f42bb)
+#   (CREATE_COIN_ANNOUNCEMENT 0xba15964450f499b53ace054a6ddd8cb7dfbef0d8f9724baafea4f3645d00b997)
+
 sim.pass_blocks(10)
-sim.push_tx(spend_bundle)
+result = sim.push_tx(spend_bundle)
+print(result)
 
-# alice_coin spent output conditions
-#   (AGG_SIG_ME 0xa042c855d234578415254b7870b711fb25e8f85beaa4a66bd0673d394c761fa156406c2e3bb375d5b18766d2a12cc918 0xe737a88067a8a759b3ee5c01c188cf70b7530ed0aa0bee95bc6e56ec00603d73)
-#   (CREATE_COIN 0xeff07522495060c066f66f32acc2a77e3a3e737aca8baea4d1a64ea4cdc13da9 1023)
-#   (ASSERT_COIN_ANNOUNCEMENT 0x413445ff6a343415e9e77127ba3feab87f648fe677da466625b2a8c0d0ccfff5)
+# The first iteration of the singleton, called the "Eve" spend is created
+# eve_id = Coin(Launcher.name(), puzzle_for_singleton(Launcher.name(), I), amount)
+launcher_id = Launcher.name()
+eve_id = std_hash(
+    launcher_id + 
+    singleton_puzzle.get_tree_hash() + 
+    int_to_bytes(T)
+)
 
-# laucnher_coin spend output conditions
-#   (CREATE_COIN 0x4b5bf198c591a5902abf71bb4c998233030c3a5be45360ccabacbb4a584aad67 1023)
-#   (CREATE_COIN_ANNOUNCEMENT 0xbbd91e928a77897bf76b637b948576a1d3976e214423cf11da38009f9ac1dccd)
+eve = sim.get_coin_by_coin_id(eve_id)
+assert eve.coin.name() == eve_id
+assert eve.coin.amount == T
+print(f'Eve:\n{eve.coin.name()}\n{eve}')
 
-# launcher_puzzle_hash: 0xeff07522495060c066f66f32acc2a77e3a3e737aca8baea4d1a64ea4cdc13da9
-# singleton_puzzle_hash: 0x4b5bf198c591a5902abf71bb4c998233030c3a5be45360ccabacbb4a584aad67
+#  --------------- (2) Transaction With I ------------------/
+#                                        |                     
+#                                        v                     
+#                 .-----------------------------------.
+#                 | Running Singleton With Program I' |
+#                 `-----------------------------------'
+#                                        |
+# --------------------- End Transaction 2 ------------------
+# == To spend the singleton requires some host side setup ==
+#
+# The singleton adds an ASSERT_MY_COIN_ID to constrain it to the coin that
+# matches its own conception of itself.  It consumes a "LineageProof" object
+# when spent that must be constructed so.  We'll call the singleton we intend
+# to spend "S".
+S = eve.coin
+#      If this is the Eve singleton:
+#
+#          PH = None
+#          L = LineageProof(Launcher, PH, amount)
+#
+#       - Note: the Eve singleton's .parent_coin_info should match Launcher here.
+PH = None
+L = LineageProof(Launcher.parent_coin_info, PH, T)
+assert L == singleton_puzzles.lineage_proof_for_coinsol(launcher_coin_spend)
 
+AI = Program.to([113, 1023, sim.alice.puzzle_hash])
+print(AI)
+S_solution = singleton_puzzles.solution_for_singleton(L, T, AI)
 
-launcher_id = launcher_coin_spend.coin.name()
-launcher_coin = sim.get_coin_by_coin_id(launcher_id)
-print(f'launcher coin spent: {launcher_coin}')
-
-singleton_puzzle = singleton_puzzles.puzzle_for_singleton(launcher_id, inner_puzzle)
-singleton_coin_id = std_hash(launcher_id + singleton_puzzle.get_tree_hash() + int_to_bytes(launcher_coin_spend.coin.amount))
-singleton_coin = sim.get_coin_by_coin_id(singleton_coin_id)
-print(f'singleton coin: {singleton_coin}')
-
-
-# Spend the Eve (or first?) singleton
-lineage_proof: LineageProof = singleton_puzzles.lineage_proof_for_coinsol(launcher_coin_spend) 
-print(lineage_proof)
-singleton_solution = singleton_puzzles.solution_for_singleton(lineage_proof, start_amt, [])
-print(singleton_solution)
-
-singleton_spend_bundle = SpendBundle(
+eve_spend_bundle = SpendBundle(
     [
         CoinSpend(
-            singleton_coin.coin,
+            S,
             singleton_puzzle,
-            singleton_solution
+            S_solution
         )
     ],
-    G2Element() # empty signature
+    G2Element()
 )
-sim.pass_blocks(10)
-sim.push_tx(singleton_spend_bundle)
-singleton_coin = sim.get_coin_by_coin_id(singleton_coin_id)
-print(f'singleton coin spent: {singleton_coin}')
-sim.pass_blocks(10)
 
-sim.farm(farmer=sim.charlie)
+sim.pass_blocks(10)
+result = sim.push_tx(eve_spend_bundle)
 
-a_coin = sim.get_coin_by_puzzle_hash(bytes.fromhex("597814e2aa3ff4a04ac1af152cb67077f15e5d2a3dc9de7f39b2ddda5721e2e2"))
-print(a_coin)
+#   (ASSERT_MY_COIN_ID 0x4736b9ea6888bcee89cb9b6c3c8aabfe3a9aa700787f2c70b825599c4db19fce)
+#   (CREATE_COIN 0x3395fea33edf7597d62f84b3fc642580dc514d65d52f728512225813e01c91b2 113) ; new singleton
+#   (CREATE_COIN 0x4f45877796d7a64e192bcc9f899afeedae391f71af3afd7e15a0792c049d23d3 910) ; send to Alice
+#   (ASSERT_MY_AMOUNT 1023) ; extra condition
+print(f'alice balance:\n{sim.alice.balance()}')
+
+
+# spend second singleton
+
+
 sim.end()
-# utils.print_json(spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
-utils.print_json(singleton_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
+utils.print_json(spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
+utils.print_json(eve_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))

@@ -1,5 +1,5 @@
 {
-    "aggregated_signature": "0x98c643f03731ae22311fc5b380d48988516baaf34efc3c99470bd13cbf101ad37dc26ff72a092907b67a96cdecc0483a0abe936161e4c68c6a82e947f31208605e7885ffd24b18e4fa34e299057e35e6356d5e180ad9f9b17ff717e6395efaf4",
+    "aggregated_signature": "0xa19addc5ef633d5d8feb7f02f84d8732f527ff81bc52d97147c8bde8c92a49b461df5cf8974a8ad3a8f49a300a97065a0249a24b71ab00e62685cd5df2a3ea4c36a6e9d1252045b565930b87c6135eca09ce17418665547dffb8c825932d9add",
     "coin_spends": [
         {
             "coin": {
@@ -8,16 +8,16 @@
                 "puzzle_hash": "0x4f45877796d7a64e192bcc9f899afeedae391f71af3afd7e15a0792c049d23d3"
             },
             "puzzle_reveal": "0xff02ffff01ff02ffff01ff02ffff03ff0bffff01ff02ffff03ffff09ff05ffff1dff0bffff1effff0bff0bffff02ff06ffff04ff02ffff04ff17ff8080808080808080ffff01ff02ff17ff2f80ffff01ff088080ff0180ffff01ff04ffff04ff04ffff04ff05ffff04ffff02ff06ffff04ff02ffff04ff17ff80808080ff80808080ffff02ff17ff2f808080ff0180ffff04ffff01ff32ff02ffff03ffff07ff0580ffff01ff0bffff0102ffff02ff06ffff04ff02ffff04ff09ff80808080ffff02ff06ffff04ff02ffff04ff0dff8080808080ffff01ff0bffff0101ff058080ff0180ff018080ffff04ffff01b0a042c855d234578415254b7870b711fb25e8f85beaa4a66bd0673d394c761fa156406c2e3bb375d5b18766d2a12cc918ff018080",
-            "solution": "0xff80ffff01ffff33ffa0eff07522495060c066f66f32acc2a77e3a3e737aca8baea4d1a64ea4cdc13da9ff830f424080ffff33ffa04f45877796d7a64e192bcc9f899afeedae391f71af3afd7e15a0792c049d23d3ff860197741199c080ffff3dffa0614b692fd90edc8352ebeaf346b39a8a725aadef53c8d9f1c6cbaa2ada1bb7238080ff8080"
+            "solution": "0xff80ffff01ffff33ffa0eff07522495060c066f66f32acc2a77e3a3e737aca8baea4d1a64ea4cdc13da9ff8203ff80ffff3dffa0d8f1af54da2a527d27c1957e6790a27cc8694a5593f1724b66c67a65ac34da538080ff8080"
         },
         {
             "coin": {
-                "amount": 1000000,
+                "amount": 1023,
                 "parent_coin_info": "0x12d7b8c1654f82f2330059abc28e3240e863450706de7fdc518026f393f68bba",
                 "puzzle_hash": "0xeff07522495060c066f66f32acc2a77e3a3e737aca8baea4d1a64ea4cdc13da9"
             },
             "puzzle_reveal": "0xff02ffff01ff04ffff04ff04ffff04ff05ffff04ff0bff80808080ffff04ffff04ff0affff04ffff02ff0effff04ff02ffff04ffff04ff05ffff04ff0bffff04ff17ff80808080ff80808080ff808080ff808080ffff04ffff01ff33ff3cff02ffff03ffff07ff0580ffff01ff0bffff0102ffff02ff0effff04ff02ffff04ff09ff80808080ffff02ff0effff04ff02ffff04ff0dff8080808080ffff01ff0bffff0101ff058080ff0180ff018080",
-            "solution": "0xffa087908e3f85bf4b55c7e7709915c2ce97a1e6ec1d227e54a04dbfee6862d546a5ff830f4240ff8080"
+            "solution": "0xffa087c6b695db9b160ba0d1a3ce6c2d0f379cafa6ab44447cbf2fd30be829c5ead1ff8203ffff8080"
         }
     ]
 }

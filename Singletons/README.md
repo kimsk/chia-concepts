@@ -158,7 +158,30 @@ So we have set up the rules for our singleton puzzle. However, how we can create
     - if not an eve spend, create a new `coin ID`
     - if eve spend, verify `launcher ID` & `launcher puzzle hash`from the curried in `SINGLETON_STRUCT` are correct
 
-> The first if statement checks if lineage_proof indicates that this is not the eve spend (three proof elements instead of two). If it is not the eve spend, it calculates our ID using the information in the lineage_proof to generate our parent ID.
+```lisp
+    ; SINGLETON_STRUCT = (MOD_HASH . (LAUNCHER_ID . LAUNCHER_PUZZLE_HASH))
+    (defun-inline launcher_id_for_singleton_struct (SINGLETON_STRUCT)
+        (f (r SINGLETON_STRUCT))
+    )
+    (defun-inline parent_info_for_lineage_proof (lineage_proof) (f lineage_proof))
+    (defun-inline launcher_puzzle_hash_for_singleton_struct (SINGLETON_STRUCT)
+        (r (r SINGLETON_STRUCT))
+    )
+    (defun-inline amount_for_lineage_proof (lineage_proof) (f (r (r lineage_proof))))
+
+    (if (=
+            (launcher_id_for_singleton_struct SINGLETON_STRUCT)
+            (sha256 
+                (parent_info_for_eve_proof lineage_proof) (launcher_puzzle_hash_for_singleton_struct SINGLETON_STRUCT) (amount_for_eve_proof lineage_proof)
+            )
+        )
+            
+        (sha256 (launcher_id_for_singleton_struct SINGLETON_STRUCT) full_puzhash my_amount)
+        (x)
+    )
+```
+
+> The first if statement checks if lineage_proof indicates that this is not the eve spend (three proof elements instead of two). If it is not the eve spend, it calculates our ID using the information in the `lineage_proof` to generate our `parent ID`.
 
 > If it is the eve spend, there is an extra check which verifies that the launcher ID and launcher puzzle hash we have (both inside the SINGLETON_STRUCT) are correct. 
 
@@ -230,3 +253,10 @@ To implement "state" in a coin set model, Chia has a singleton puzzle which can 
 - [New Singleton 1.1 Standard Top Layer](https://developers.chia.net/t/new-singleton-1-1-standard-top-layer/387)
 - [singleton_top_layer.py](https://github.com/Chia-Network/chia-blockchain/blob/optimize_singleton_v1.1/chia/wallet/puzzles/singleton_top_layer.py)
 - [`logand`](https://chialisp.com/docs/ref/clvm#bit-operations)
+
+https://github.dev/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/singleton_top_layer.py
+https://github.dev/Chia-Network/chia-blockchain/blob/optimize_singleton_v1.1/chia/wallet/puzzles/singleton_top_layer.py
+https://github.com/Chia-Network/chia-blockchain/blob/main/tests/clvm/test_singletons.py
+https://github.com/Flax-Network/flax-light-wallet/blob/94d3eede10f3feb3ec3cd3b783c168524b37c2b3/flaxlight/wallet/did_wallet/did_wallet_puzzles.py#L29
+https://github.dev/Chia-Network/chia-blockchain/blob/optimize_singleton_v1.1/chia/wallet/puzzles/singleton_top_layer_v1_1.clvm
+https://github.com/geoffwalmsley/CreatorNFT/blob/c5b818c03c9e31cfc629b05e4fad239cc1693397/tests/test_puzzles.py#L456
