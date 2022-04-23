@@ -50,6 +50,9 @@ def get_coin_record_by_coin_id(coin_id):
 def get_coin_records_by_parent_ids(parent_ids):
     return asyncio.run(network.sim_client.get_coin_records_by_parent_ids(parent_ids))
 
+def get_coin_records_by_hint(hint):
+    return asyncio.run(network.sim_client.get_coin_record_by_name(hint))
+
 def pass_blocks(number):
     network.sim.pass_blocks(number)
 

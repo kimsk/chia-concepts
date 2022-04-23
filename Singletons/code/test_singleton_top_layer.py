@@ -1,5 +1,5 @@
 # https://github.com/Chia-Network/release-test-chia-blockchain/blob/02a880fbac6f0c304b84b6f485d10af2251f7dbc/tests/clvm/test_singletons.py
-
+# https://developers.chia.net/t/tracking-the-unspent-singleton-coin/478
 import sys
 from typing import List, Tuple
 sys.path.insert(0, "../../shared")
@@ -39,16 +39,14 @@ assert starting_coin != None
 # Adapt the puzzle to Singleton
 adapted_puzzle: Program = singleton_top_layer.adapt_inner_to_singleton(starting_puzzle)
 adapted_puzzle_hash: bytes32 = adapted_puzzle.get_tree_hash()
-comment: List[Tuple[str, str]] = [("Hello", "Chia")]
+comment: List[Tuple[str, str]] = [("Hello", "Chia")] # key_value_list
 conditions, launcher_coinsol = singleton_top_layer.launch_conditions_and_coinsol(
                     starting_coin, 
                     adapted_puzzle, 
                     comment, 
                     START_AMOUNT
                 )
-# conditions
-# (CREATE_COIN 0xeff0752... 1023)
-# (ASSERT_COIN_ANNOUNCEMENT 0x8ab82db7...)
+
 launcher_id = std_hash(
     starting_coin.name() +
     singleton_top_layer.SINGLETON_LAUNCHER_HASH + 
@@ -56,6 +54,22 @@ launcher_id = std_hash(
 ) 
 assert launcher_id == launcher_coinsol.coin.name()
 print(f'Launcher Id: {launcher_id}\n')
+
+print(conditions)
+# add launcher id as hint
+create_coin_condition = next(c for c in conditions if ConditionOpcode(c.as_atom_list()[0]) == ConditionOpcode.CREATE_COIN).as_atom_list()
+conditions[0] = Program.to(
+        [
+            ConditionOpcode.CREATE_COIN,
+            create_coin_condition[1], # puzzle hash
+            create_coin_condition[2], # amount
+            launcher_id # hint
+        ])
+print(conditions[0].as_atom_list())
+
+# conditions
+# (CREATE_COIN 0xeff0752... 1023)
+# (ASSERT_COIN_ANNOUNCEMENT 0x8ab82db7...)
 
 # Creating solution for standard transaction
 delegated_puzzle: Program = p2_delegated_puzzle_or_hidden_puzzle.puzzle_for_conditions(conditions)
@@ -89,7 +103,7 @@ creating_eve_spend_bundle = SpendBundle(
 )
 sim.pass_blocks(10)
 result = sim.push_tx(creating_eve_spend_bundle)
-print(f'creating singleton spend result:\n{result}\n')
+print(f'creating eve spend result:\n{result}\n')
 
 # consuming coin (0xe3b0c44298fc1c149afbf4c8996fb92400000000000000000000000000000001 0x4f45877796d7a64e192bcc9f899afeedae391f71af3afd7e15a0792c049d23d3 0x01977420dc00)
 #   with id 12d7b8c1654f82f2330059abc28e3240e863450706de7fdc518026f393f68bba
@@ -106,11 +120,15 @@ print(f'creating singleton spend result:\n{result}\n')
 # Spend Eve
 ###########
 
+# Find the singleton coin with hint
+coins = sim.get_coin_records_by_hint(launcher_id)
+
 # Find the singleton coin
 # 1. parent id is singleton_eve
 coins = sim.get_coin_records_by_parent_ids([launcher_id]) 
 # 2. amount is odd
 eve = next(c.coin for c in coins if c.coin.amount%2 != 0)
+print(f'eve coin:\n{eve}\n')
 
 delegated_puzzle: Program = Program.to(
     (
@@ -169,14 +187,13 @@ eve_spend_bundle = SpendBundle(
 
 sim.pass_blocks(10)
 result = sim.push_tx(eve_spend_bundle)
-print(f'singleton eve spend result:\n{result}\n')
+print(f'eve spend result:\n{result}\n')
 
 # consuming coin (0x6a4ba7e394f8d346deafcda74b26bcad649ed0cb691d7172b14970c4cf47a570 0xa1af73b7dc0f246ffb0bd41b4ac8f0253f4c0949bfdd070d52a3be037767baa3 1023)
 #   with id a484f2edad0b69fdf6ef4def3c0e05210a892161688d453d20fb659632ec3a57
 #   (ASSERT_MY_COIN_ID 0xa484f2edad0b69fdf6ef4def3c0e05210a892161688d453d20fb659632ec3a57)
 #   (AGG_SIG_ME 0xa042c855d234578415254b7870b711fb25e8f85beaa4a66bd0673d394c761fa156406c2e3bb375d5b18766d2a12cc918 0x07fa3e022122b6388b9ae118a83b0273a0549f6f7d9585e75ff25235cf239fba)
 #   (CREATE_COIN 0xa1af73b7dc0f246ffb0bd41b4ac8f0253f4c0949bfdd070d52a3be037767baa3 1023)
-
 
 ############
 # POST-EVE 1
@@ -187,6 +204,7 @@ print(f'singleton eve spend result:\n{result}\n')
 coins = sim.get_coin_records_by_parent_ids([eve.name()]) 
 # 2. amount is odd
 post_eve_1 = next(c.coin for c in coins if c.coin.amount%2 != 0)
+print(f'post_eve_1 coin:\n{post_eve_1}\n')
 
 # spend second singleton
 #          PH = ParentOf(S).inner_puzzle_hash
@@ -238,7 +256,13 @@ print(f'post eve 1 spend result:\n{result}\n')
 #   (AGG_SIG_ME 0xa042c855d234578415254b7870b711fb25e8f85beaa4a66bd0673d394c761fa156406c2e3bb375d5b18766d2a12cc918 0x07fa3e022122b6388b9ae118a83b0273a0549f6f7d9585e75ff25235cf239fba)
 #   (CREATE_COIN 0xa1af73b7dc0f246ffb0bd41b4ac8f0253f4c0949bfdd070d52a3be037767baa3 1023)
 
+# puzzle hash of the eve, post-eve-1, and post-eve-2 are the same, 
+# because we provide the same inner_solution
+# 0xa1af73b7dc0f246ffb0bd41b4ac8f0253f4c0949bfdd070d52a3be037767baa3
+
+
+
 sim.end()
-utils.print_json(creating_eve_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
-utils.print_json(eve_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
-utils.print_json(post_eve_1_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
+# utils.print_json(creating_eve_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
+# utils.print_json(eve_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
+# utils.print_json(post_eve_1_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))

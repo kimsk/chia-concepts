@@ -7,7 +7,6 @@
 ## What
 > A singleton is a special kind of puzzle that asserts **uniqueness**, preventing other coins from being mistaken for it. It can change state over time, each time creating a new puzzle based on the previous. It wraps an **inner puzzle** which can have whatever behavior you desire. These traits combined allow for smart contracts and things like NFTs to be created. -- [What is a singleton?](https://developers.chia.net/t/what-is-a-singleton/87)
 
-
 Fundamentally, a singleton puzzle is the followings:
 - An outer puzzle
 - A puzzle with unique id
@@ -15,10 +14,10 @@ Fundamentally, a singleton puzzle is the followings:
 ## Why
 > Coins on the network are state, the puzzle is the data contained within them. You can spend them to change their state however you like, by creating new coins. This is what singletons excel at. -- [Can you store state on the network?](https://developers.chia.net/t/can-you-store-state-on-the-network/84)
 
-### Coin Id
+### Coin Id & Puzzle Hash
 Each coin has a unique [coin_id](../COIN_ID.md) which derived from `parent_coin_id`, `puzzle_hash`, and its `amount` (in mojos). 
 
-Once you spend the coin with the existing state, you could get a new unspent coin with the new state. However, this means that you have to keep track of a valid `coin_id`
+Once you spend the coin with the existing state, you could get a new unspent coin with the new state (different puzzle hash). However, this means that you have to keep track of a valid `coin_id` or `puzzle_hash`.
 
 ### Launcher Id
 In the account model (e.g, Ethereum), you have a unique contract address that you can access and update data. In the coin set model, however, coins are state, so we need to be able to extract state that we are interested from those coins somehow. To update those states, we will need to spend them and create new coins. **A singleton coin provides a unique id called launcher id that can be used as permanent unique address.** The singleton coin is spent and the new singleton coin is created, but the `launcher id` (a unique id) is always the same.
