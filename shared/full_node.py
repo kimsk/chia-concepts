@@ -1,4 +1,5 @@
 import asyncio
+from typing import List
 from chia.rpc.full_node_rpc_client import FullNodeRpcClient
 from chia.types.blockchain_format.sized_bytes import bytes32
 from chia.types.spend_bundle import SpendBundle
@@ -12,25 +13,52 @@ selected_network = config["selected_network"]
 genesis_challenge = config["farmer"]["network_overrides"]["constants"][selected_network]["GENESIS_CHALLENGE"]
 
 print(f'network: {selected_network}')
-
 self_hostname = config["self_hostname"] # localhost
 full_node_rpc_port = config["full_node"]["rpc_port"] # 8555
-wallet_rpc_port = config["wallet"]["rpc_port"] # 9256
 
-async def get_coin_async(coin_id: str):
+async def get_coin_records_by_puzzle_hash_async(puzzle_hash: bytes32):
     try:
         full_node_client = await FullNodeRpcClient.create(
                 self_hostname, uint16(full_node_rpc_port), DEFAULT_ROOT_PATH, config
             )
-        coin_record = await full_node_client.get_coin_record_by_name(bytes32.fromhex(coin_id))
-        return coin_record.coin
+        coin_records = await full_node_client.get_coin_records_by_puzzle_hash(puzzle_hash)
+        return coin_records
     finally:
         full_node_client.close()
         await full_node_client.await_closed()
 
+async def get_coin_record_by_name_async(coin_id: bytes32):
+    try:
+        full_node_client = await FullNodeRpcClient.create(
+                self_hostname, uint16(full_node_rpc_port), DEFAULT_ROOT_PATH, config
+            )
+        coin_record = await full_node_client.get_coin_record_by_name(coin_id)
+        return coin_record
+    finally:
+        full_node_client.close()
+        await full_node_client.await_closed()
 
-def get_coin(coin_id: str):
-    return asyncio.run(get_coin_async(coin_id))
+async def get_coin_records_by_parent_ids_async(parent_ids: List[bytes32]):
+    try:
+        full_node_client = await FullNodeRpcClient.create(
+                self_hostname, uint16(full_node_rpc_port), DEFAULT_ROOT_PATH, config
+            )
+        coin_records = await full_node_client.get_coin_records_by_parent_ids(parent_ids)
+        return coin_records
+    finally:
+        full_node_client.close()
+        await full_node_client.await_closed()
+
+async def get_coin_records_by_hint_async(hint: bytes32):
+    try:
+        full_node_client = await FullNodeRpcClient.create(
+                self_hostname, uint16(full_node_rpc_port), DEFAULT_ROOT_PATH, config
+            )
+        coin_records = await full_node_client.get_coin_records_by_hint(hint)
+        return coin_records
+    finally:
+        full_node_client.close()
+        await full_node_client.await_closed()
 
 async def push_tx_async(spend_bundle: SpendBundle):
     try:
@@ -43,6 +71,18 @@ async def push_tx_async(spend_bundle: SpendBundle):
     finally:
         full_node_client.close()
         await full_node_client.await_closed()
+
+def get_coin_records_by_puzzle_hash(puzzle_hash: bytes32):
+    return asyncio.run(get_coin_records_by_puzzle_hash_async(puzzle_hash))
+
+def get_coin_record_by_name(coin_id: bytes32):
+    return asyncio.run(get_coin_record_by_name_async(coin_id))
+
+def get_coin_records_by_parent_ids(parent_ids: List[bytes32]):
+    return asyncio.run(get_coin_records_by_parent_ids_async(parent_ids))
+
+def get_coin_records_by_hint(hint: bytes32):
+    return asyncio.run(get_coin_records_by_hint_async(hint))
 
 def push_tx(spend_bundle: SpendBundle):
     return asyncio.run(push_tx_async(spend_bundle))

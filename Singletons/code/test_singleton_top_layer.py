@@ -55,17 +55,17 @@ launcher_id = std_hash(
 assert launcher_id == launcher_coinsol.coin.name()
 print(f'Launcher Id: {launcher_id}\n')
 
-print(conditions)
+# WRONG, we need to update the singleton_launcher.clsp
 # add launcher id as hint
-create_coin_condition = next(c for c in conditions if ConditionOpcode(c.as_atom_list()[0]) == ConditionOpcode.CREATE_COIN).as_atom_list()
-conditions[0] = Program.to(
-        [
-            ConditionOpcode.CREATE_COIN,
-            create_coin_condition[1], # puzzle hash
-            create_coin_condition[2], # amount
-            launcher_id # hint
-        ])
-print(conditions[0].as_atom_list())
+# create_coin_condition = next(c for c in conditions if ConditionOpcode(c.as_atom_list()[0]) == ConditionOpcode.CREATE_COIN).as_atom_list()
+# conditions[0] = Program.to(
+#         [
+#             ConditionOpcode.CREATE_COIN,
+#             create_coin_condition[1], # puzzle hash
+#             create_coin_condition[2], # amount
+#             launcher_id # hint
+#         ])
+# print(f'conditions with hint: \n{conditions[0].as_atom_list()}\n')
 
 # conditions
 # (CREATE_COIN 0xeff0752... 1023)
@@ -138,6 +138,7 @@ delegated_puzzle: Program = Program.to(
                 ConditionOpcode.CREATE_COIN,
                 adapted_puzzle_hash,
                 eve.amount,
+                launcher_id # hint
             ]
         ],
     )
@@ -264,5 +265,5 @@ print(f'post eve 1 spend result:\n{result}\n')
 
 sim.end()
 # utils.print_json(creating_eve_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
-# utils.print_json(eve_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
+utils.print_json(eve_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
 # utils.print_json(post_eve_1_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
