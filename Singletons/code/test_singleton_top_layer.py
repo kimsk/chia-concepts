@@ -120,9 +120,6 @@ print(f'creating eve spend result:\n{result}\n')
 # Spend Eve
 ###########
 
-# Find the singleton coin with hint
-coins = sim.get_coin_records_by_hint(launcher_id)
-
 # Find the singleton coin
 # 1. parent id is singleton_eve
 coins = sim.get_coin_records_by_parent_ids([launcher_id]) 
@@ -138,7 +135,7 @@ delegated_puzzle: Program = Program.to(
                 ConditionOpcode.CREATE_COIN,
                 adapted_puzzle_hash,
                 eve.amount,
-                launcher_id # hint
+                [launcher_id] # hint
             ]
         ],
     )
