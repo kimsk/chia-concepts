@@ -1,0 +1,33 @@
+(mod (
+        my_amount
+        to_puzzle_hash
+        pks
+     )
+
+    (include condition_codes.clib)
+
+    (defun agg_sig_me (keys my_amount) 
+        (if (l keys)
+            (c 
+                (list AGG_SIG_ME (f keys) (sha256 my_amount))
+                (agg_sig_me (r keys) my_amount)
+            )
+            ()
+        )
+    )
+
+    (defun merge_lists (l1 l2)
+        (if (l l1)
+            (c (f l1) (merge_lists (r l1) l2))
+            l2
+        )
+    )
+
+    (merge_lists
+        (list
+            (list CREATE_COIN to_puzzle_hash my_amount)
+            (list ASSERT_MY_AMOUNT my_amount)
+        )
+        (agg_sig_me pks my_amount)
+    )
+)

@@ -1,0 +1,15 @@
+; Secret Key: 5a02209afa1c6b40e3f36f133d11e2044173bb72f417eb3de175dc0f411c660b
+; Public Key: 966adadf2af72e4daee06479755570778370d47a289fd2afd5dd4cce8def2a396e7a1e0d2bc0fa7b58105bcbb2d3f83d
+; Fingerprint: 4230202470
+; HD Path: m
+
+(mod conditions
+    (include condition_codes.clib)
+    (defconstant PK 0x966adadf2af72e4daee06479755570778370d47a289fd2afd5dd4cce8def2a396e7a1e0d2bc0fa7b58105bcbb2d3f83d)
+
+    (c
+        (list AGG_SIG_UNSAFE PK "hello")
+        (list AGG_SIG_ME PK "hello")
+        conditions
+    )
+)

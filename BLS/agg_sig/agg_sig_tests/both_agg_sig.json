@@ -1,0 +1,14 @@
+{
+    "aggregated_signature": "0x8a560d49a57a9ecf95e1277b7ef97002cf85311479bef533479a640587d76ce5a9435add64d28b49dc68513fe9882cc005a5e3285887e7a986d5d6635618143add524b6843a1885e0beca551a37b57c3bf3ce6460ac004b15526cfc7fc6e0e91",
+    "coin_spends": [
+        {
+            "coin": {
+                "amount": 1000000,
+                "parent_coin_info": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "puzzle_hash": "0x1a28bf4a3ae7400781df06b17788d5d293169cadc98d7d869f046825ab78d9ad"
+            },
+            "puzzle_reveal": "0xff02ffff01ff04ffff04ff0affff04ff0effff01ff8568656c6c6f808080ffff04ffff04ff04ffff04ff0effff01ff8568656c6c6f808080ff808080ffff04ffff01ff32ff31b0966adadf2af72e4daee06479755570778370d47a289fd2afd5dd4cce8def2a396e7a1e0d2bc0fa7b58105bcbb2d3f83dff018080",
+            "solution": "0x80"
+        }
+    ]
+}

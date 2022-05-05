@@ -1,0 +1,14 @@
+(mod (
+        my_amount
+        to_puzzle_hash
+        agg_pk
+     )
+
+    (include condition_codes.clib)
+
+    (list
+        (list CREATE_COIN to_puzzle_hash my_amount)
+        (list ASSERT_MY_AMOUNT my_amount)
+        (list AGG_SIG_ME agg_pk (sha256 my_amount))
+    )
+)

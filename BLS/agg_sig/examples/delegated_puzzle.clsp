@@ -1,0 +1,11 @@
+(mod (
+        my_amount
+        puzzle_hash
+     )
+
+    (list
+        (list 51 puzzle_hash my_amount)
+        (list 72 my_puzzlehash)
+        (list 73 my_amount)
+    )
+)
