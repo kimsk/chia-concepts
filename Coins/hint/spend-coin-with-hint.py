@@ -28,9 +28,9 @@ import utils
 
 # Get keys
 fingerprint = 1848951423
-wallet_hd_path = [12381, 8444, 2, 3]
+wallet_hd_path = [12381, 8444, 2, 42]
 wallet_pk: G1Element = wallet.get_public_key(fingerprint, wallet_hd_path)
-# print(f'wallet_pk: {wallet_pk}')
+print(f'wallet_pk: {wallet_pk}')
 
 # Starting Coin
 START_AMOUNT: uint64 = 1_000_000 
@@ -40,17 +40,18 @@ starting_coin: Coin = next(cr.coin for cr in coin_records if cr.spent == False)
 assert starting_coin != None
 
 print(f'starting_coin: {starting_coin}')
-wallet_pk_42: G1Element = wallet.get_public_key(fingerprint, [12381, 8444, 2, 42])
-puzzle_hash_42 = p2_delegated_puzzle_or_hidden_puzzle.puzzle_for_pk(wallet_pk_42).get_tree_hash()
-print(puzzle_hash_42)
+
+wallet_pk_12: G1Element = wallet.get_public_key(fingerprint, [12381, 8444, 2, 12])
+puzzle_hash_12 = p2_delegated_puzzle_or_hidden_puzzle.puzzle_for_pk(wallet_pk_12).get_tree_hash()
+print(puzzle_hash_12)
 
 hint = bytes.fromhex("b23dee66835e536f7f1ce287b0837c0cb12aabfe250719cb19302db8ecceac73")
 
 condition_args = [
     [
         ConditionOpcode.CREATE_COIN,
-        puzzle_hash_42,
-        starting_coin.amount,
+        puzzle_hash_12,
+        starting_coin.amount - 500_000_000,
         [hint] # hint
     ]
 ]
@@ -81,9 +82,3 @@ spend_bundle = SpendBundle(
 
 result = full_node.push_tx(spend_bundle)
 print(f'spend result:\n{result}\n')
-
-utils.print_json(spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
-
-# spend result:
-# {'status': 'SUCCESS', 'success': True}
-

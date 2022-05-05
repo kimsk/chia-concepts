@@ -72,6 +72,20 @@ def get_signature(fingerprint: int,
         message
     ))
 
+# https://docs.chia.net/docs/09keys/keys-and-signatures/#non-observer-vs-observer-keys
+# https://github.com/Chia-Network/bls-signatures/blob/main/python-bindings/README.md#hd-keys-using-eip-2333
+def pk_derive_path_unhardened(pk: G1Element, path: List[int]) -> G1Element:
+    for index in path:
+        pk = AugSchemeMPL.derive_child_pk_unhardened(pk, index)
+    return pk
+
+def get_observer_keys(observer_pk: G1Element, path: List[int],  n: int):
+    child_pks = []
+    for i in range(0, n):
+        child_pk = pk_derive_path_unhardened(observer_pk, [i])
+        child_pks.append(child_pk)
+    return child_pks
+
 def get_public_key(fingerprint: int, hd_path: List[int]):
     sk = asyncio.run(get_secret_key_async(fingerprint, hd_path))
     return sk.get_g1()

@@ -10,8 +10,10 @@ from chia.types.coin_record import CoinRecord
 from chia.types.condition_opcodes import ConditionOpcode
 from chia.types.spend_bundle import SpendBundle
 
-from chia.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import DEFAULT_HIDDEN_PUZZLE_HASH, calculate_synthetic_secret_key, puzzle_for_public_key_and_hidden_puzzle_hash
-
+from chia.wallet.puzzles import (
+    p2_delegated_puzzle_or_hidden_puzzle,
+    singleton_top_layer,
+)
 network: Network = asyncio.run(Network.create())
 asyncio.run(network.farm_block())
 
@@ -66,9 +68,9 @@ def get_normal_coin_spend(wallet: Wallet, coin, conditions):
     assert coin != None
 
     delegated_puzzle_solution = Program.to((1, conditions))
-    synthetic_sk: PrivateKey = calculate_synthetic_secret_key(
+    synthetic_sk: PrivateKey = p2_delegated_puzzle_or_hidden_puzzle.calculate_synthetic_secret_key(
         wallet.sk_,
-        DEFAULT_HIDDEN_PUZZLE_HASH
+        p2_delegated_puzzle_or_hidden_puzzle.DEFAULT_HIDDEN_PUZZLE_HASH
     )
     synthetic_pk = synthetic_sk.get_g1()
 
@@ -84,3 +86,12 @@ def get_normal_coin_spend(wallet: Wallet, coin, conditions):
     sig = AugSchemeMPL.sign(synthetic_sk, sig_msg)
 
     return coin_spend, sig_msg, sig, synthetic_pk
+
+def get_signature(wallet: Wallet, message):
+    sk = wallet.sk_
+    synthetic_sk: PrivateKey = p2_delegated_puzzle_or_hidden_puzzle.calculate_synthetic_secret_key(
+        sk,
+        p2_delegated_puzzle_or_hidden_puzzle.DEFAULT_HIDDEN_PUZZLE_HASH
+    )
+    sig = AugSchemeMPL.sign(synthetic_sk, message)
+    return sig
