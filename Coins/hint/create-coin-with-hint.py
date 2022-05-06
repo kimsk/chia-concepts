@@ -28,7 +28,7 @@ import utils
 
 # Get keys
 fingerprint = 1848951423
-wallet_hd_path = [12381, 8444, 2, 7]
+wallet_hd_path = [12381, 8444, 2, 41]
 wallet_pk: G1Element = wallet.get_public_key(fingerprint, wallet_hd_path)
 # print(f'wallet_pk: {wallet_pk}')
 
@@ -39,8 +39,8 @@ coin_records: List[CoinRecord] = full_node.get_coin_records_by_puzzle_hash(start
 starting_coin: Coin = next(cr.coin for cr in coin_records if cr.spent == False)
 assert starting_coin != None
 
-print(f'starting_coin: {starting_coin}')
-exit()
+# print(f'starting_coin: {starting_coin}')
+
 wallet_pk_41: G1Element = wallet.get_public_key(fingerprint, [12381, 8444, 2, 41])
 puzzle_hash_41 = p2_delegated_puzzle_or_hidden_puzzle.puzzle_for_pk(wallet_pk_41).get_tree_hash()
 print(puzzle_hash_41)
@@ -80,11 +80,12 @@ spend_bundle = SpendBundle(
     sig
 )
 
-result = full_node.push_tx(spend_bundle)
-print(f'spend result:\n{result}\n')
+# result = full_node.push_tx(spend_bundle)
+# print(f'spend result:\n{result}\n')
 
 utils.print_json(spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
 
 # spend result:
 # {'status': 'SUCCESS', 'success': True}
 
+# cdv inspect spendbundles ./create-coin-with-hint-spend-bundle.json -db -sd -n testnet10
