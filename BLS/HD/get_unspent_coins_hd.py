@@ -1,7 +1,8 @@
+import json
 import sys
-from typing import List
 sys.path.insert(0, "../../shared")
 
+from typing import List
 from blspy import (G1Element)
 from chia.types.coin_record import CoinRecord
 from chia.util import (bech32m)
@@ -10,6 +11,8 @@ from chia.wallet.puzzles import (
 )
 import full_node
 import wallet
+
+NUM_KEYS = 50
 
 # Get keys
 fingerprint = 1848951423
@@ -22,7 +25,7 @@ def get_puzzle_hash(pk: G1Element):
 def get_address(puzzhash):
     return bech32m.encode_puzzle_hash(puzzhash, "txch")
 
-pks: List[G1Element] = wallet.get_observer_keys(pk, hd_path,  5000)
+pks: List[G1Element] = wallet.get_observer_keys(pk, hd_path,  NUM_KEYS)
 puzzle_hashes = list(
     map(get_puzzle_hash, pks)
 )
@@ -32,8 +35,18 @@ puzzle_hashes = list(
 
 coin_records: List[CoinRecord] = full_node.get_coin_records_by_puzzle_hashes(puzzle_hashes)
 
+cr_dict = {}
+for cr in coin_records:
+    address = get_address(cr.coin.puzzle_hash)
+    if cr.spent_block_index == 0:
+        if address not in cr_dict:
+            cr_dict[address] = []
+        cr_dict[address].append(cr.coin.to_json_dict())
+
+print(json.dumps(cr_dict, indent=4))
+
 balance = 0
 for cr in coin_records:
-    if cr.spent_block_index != 0:
+    if cr.spent_block_index == 0:
         balance += cr.coin.amount
 print(balance)
