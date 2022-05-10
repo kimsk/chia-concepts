@@ -84,9 +84,25 @@ spend_bundle_4, coin_spend_4 = singleton_utils.spend_singleton(
 )
 result_D = sim.push_tx(spend_bundle_4)
 print(f'spend result:\n{result_D}\n')
+
 is_eve, unspent_singleton = singleton_utils.get_singleton(launcher_id_1)
 print(is_eve)
 print(unspent_singleton)
+
+spend_bundle_5, coin_spend_5 = singleton_utils.spend_singleton(
+    sim.alice,
+    launcher_id_1,
+    coin_spend_4,
+    adapted_puzzle_1
+)
+result_E = sim.push_tx(spend_bundle_5)
+print(f'spend result:\n{result_E}\n')
+
+is_eve, unspent_singleton = singleton_utils.get_singleton(launcher_id_1)
+print(is_eve)
+print(unspent_singleton)
+
+print(sim.get_coins_records_by_puzzle_hash(unspent_singleton.puzzle_hash))
 
 sim.end()
 

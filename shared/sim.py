@@ -50,7 +50,7 @@ def get_coin_record_by_coin_id(coin_id):
     return asyncio.run(network.sim_client.get_coin_record_by_name(coin_id))
 
 def get_coin_records_by_parent_ids(parent_ids):
-    return asyncio.run(network.sim_client.get_coin_records_by_parent_ids(parent_ids))
+    return asyncio.run(network.sim_client.get_coin_records_by_parent_ids(parent_ids, include_spent_coins = True))
 
 def get_puzzle_and_solution(coin_id, height):
     return asyncio.run(network.sim_client.get_puzzle_and_solution(coin_id, height))
