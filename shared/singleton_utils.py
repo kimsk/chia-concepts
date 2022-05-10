@@ -4,13 +4,14 @@ from cdv.test import Wallet
 
 from chia.consensus.default_constants import DEFAULT_CONSTANTS
 from chia.types.blockchain_format.coin import Coin
+from chia.types.coin_record import CoinRecord
 from chia.types.blockchain_format.program import Program
+from chia.types.blockchain_format.sized_bytes import bytes32
 from chia.types.coin_spend import CoinSpend
 from chia.types.condition_opcodes import ConditionOpcode
 from chia.types.spend_bundle import SpendBundle
 from chia.util.hash import std_hash
-import chia.wallet.puzzles.singleton_top_layer as singleton_top_layer
-
+from chia.wallet.lineage_proof import LineageProof
 from chia.wallet.puzzles import (
     p2_delegated_puzzle_or_hidden_puzzle,
     singleton_top_layer,
@@ -88,13 +89,13 @@ def create_singleton(wallet: Wallet, start_amount, comment: List[Tuple[str, str]
     print(full_solution)
 
     starting_coin_spend = CoinSpend(
-        starting_coin, # Alice's
+        starting_coin, 
         starting_puzzle, # standard transaction
         full_solution,
     )
 
     starting_coin_spend_sig = sim.get_signature(
-        sim.alice,
+        wallet,
         (
             delegated_puzzle.get_tree_hash()
             + starting_coin.name()
@@ -111,4 +112,74 @@ def create_singleton(wallet: Wallet, start_amount, comment: List[Tuple[str, str]
     )
 
     utils.print_json(creating_eve_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
-    return launcher_id, creating_eve_spend_bundle
+    return launcher_id, creating_eve_spend_bundle, launcher_coin_spend, adapted_puzzle
+
+def get_singleton(launcher_id):
+    parent_coin_id = launcher_id
+    while parent_coin_id != None:
+        coin_records: List[CoinRecord] = sim.get_coin_records_by_parent_ids([parent_coin_id]) 
+        singleton: CoinRecord = next(cr for cr in coin_records if cr.coin.amount%2 != 0)
+
+        if singleton != None:
+            if singleton.spent_block_index == 0:
+                return parent_coin_id == launcher_id, singleton.coin
+            parent_coin_id = singleton.coin.name()
+        else:
+            parent_coin_id = None
+
+
+
+def spend_singleton(wallet: Wallet, launcher_id, coin_spend: CoinSpend, adapted_puzzle: Program):
+    _, singleton_coin = get_singleton(launcher_id)
+    assert singleton_coin != None
+    delegated_puzzle: Program = Program.to(
+        (
+            1,
+            [
+                [
+                    ConditionOpcode.CREATE_COIN,
+                    adapted_puzzle.get_tree_hash(),
+                    singleton_coin.amount
+                ]
+            ],
+        )
+    )
+
+    inner_solution: Program = Program.to([[], delegated_puzzle, []])
+    puzzle_reveal: Program = singleton_top_layer.puzzle_for_singleton(
+        launcher_id,
+        adapted_puzzle,
+    )
+
+    
+
+    lineage_proof = singleton_top_layer.lineage_proof_for_coinsol(coin_spend)
+
+    full_solution: Program = singleton_top_layer.solution_for_singleton(
+        lineage_proof,
+        singleton_coin.amount,
+        inner_solution,
+    )
+
+    coin_spend = CoinSpend(
+        singleton_coin,
+        puzzle_reveal,
+        full_solution
+    )
+
+    coin_spend_sig = sim.get_signature(
+        wallet,
+        (
+            delegated_puzzle.get_tree_hash()
+            + singleton_coin.name()
+            + DEFAULT_CONSTANTS.AGG_SIG_ME_ADDITIONAL_DATA
+        )
+    )
+
+    spend_bundle = SpendBundle(
+        [coin_spend],
+        coin_spend_sig
+    )
+
+    utils.print_json(spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
+    return spend_bundle, coin_spend

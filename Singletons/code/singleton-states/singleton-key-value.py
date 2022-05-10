@@ -1,9 +1,11 @@
+from cmath import sin
 import sys
 from typing import List, Tuple
 sys.path.insert(0, "../../../shared")
 
 from chia.types.blockchain_format.program import Program, SerializedProgram
 from chia.types.blockchain_format.sized_bytes import bytes32
+from chia.types.condition_opcodes import ConditionOpcode
 from chia.util.hash import std_hash
 from chia.util.ints import uint64
 from chia.wallet.puzzles import (
@@ -19,18 +21,18 @@ START_AMOUNT: uint64 = uint64(1023)
 
 sim.farm(sim.alice)
 
-launcher_id_1, spend_bundle = singleton_utils.create_singleton(sim.alice, START_AMOUNT, [("Group", "A")])
+launcher_id_1, spend_bundle_1, launcher_coin_spend_1, adapted_puzzle_1 = singleton_utils.create_singleton(sim.alice, START_AMOUNT, [("Group", "A")])
 
 sim.pass_blocks(10)
-result_A = sim.push_tx(spend_bundle)
+result_A = sim.push_tx(spend_bundle_1)
 print(f'creating eve spend result:\n{result_A}\n')
 
-launcher_id_2, spend_bundle = singleton_utils.create_singleton(sim.alice, START_AMOUNT, [("Group", "B")])
-result_B = sim.push_tx(spend_bundle)
+launcher_id_2, spend_bundle_2, launcher_coin_spend_2, adapted_puzzle_2 = singleton_utils.create_singleton(sim.alice, START_AMOUNT, [("Group", "B")])
+result_B = sim.push_tx(spend_bundle_2)
 print(f'creating eve spend result:\n{result_B}\n')
 
-launcher_id_3, spend_bundle = singleton_utils.create_singleton(sim.alice, START_AMOUNT, [("Group", "C")])
-result_C = sim.push_tx(spend_bundle)
+launcher_id_3, spend_bundle_3, launcher_coin_spend_3, adapted_puzzle_3 = singleton_utils.create_singleton(sim.alice, START_AMOUNT, [("Group", "C")])
+result_C = sim.push_tx(spend_bundle_3)
 print(f'creating eve spend result:\n{result_C}\n')
 
 # when the new coin with launcher's puzzle hash (singleton_top_layer.SINGLETON_LAUNCHER) is created and spent
@@ -40,7 +42,7 @@ print(f'creating eve spend result:\n{result_C}\n')
 # (0x0c0d126c89fc434fbf5ddbf6ad2afd1c5529a9df4f099608c6cd536d753948b2 1023 (("Group" . "A")))
 # the singleton child can also be tracked
 
-def get_singleton(group):
+def get_singleton_by_group(group):
     coin_records = sim.get_coins_records_by_puzzle_hash(singleton_top_layer.SINGLETON_LAUNCHER_HASH) 
     for cr in coin_records:
         coin = cr.coin
@@ -66,8 +68,25 @@ def get_singleton(group):
 
 
 # look for group b
-group_b = get_singleton("B")
+group_b = get_singleton_by_group("B")
 print(group_b)
+
+is_eve, unspent_singleton = singleton_utils.get_singleton(launcher_id_1)
+print(is_eve)
+print(unspent_singleton)
+
+
+spend_bundle_4, coin_spend_4 = singleton_utils.spend_singleton(
+    sim.alice,
+    launcher_id_1,
+    launcher_coin_spend_1,
+    adapted_puzzle_1
+)
+result_D = sim.push_tx(spend_bundle_4)
+print(f'spend result:\n{result_D}\n')
+is_eve, unspent_singleton = singleton_utils.get_singleton(launcher_id_1)
+print(is_eve)
+print(unspent_singleton)
 
 sim.end()
 
