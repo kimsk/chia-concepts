@@ -1,0 +1,8 @@
+; add output from inner puzzle with y
+(mod (
+        inner_puzzle
+        x
+        y
+    )
+    (+ (a inner_puzzle x) y)
+)
