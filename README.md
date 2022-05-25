@@ -14,7 +14,10 @@
 
 ## Advanced
 - [Chia Asset Tokens (CATs)]
+- [DataLayer]
+- [NFT]
 - [Offers]
+- []
 
 
 # Notes (WIP)
