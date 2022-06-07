@@ -1,9 +1,16 @@
-$FINGERPRINT = 990489918
-$FEE = 500000000 # 500_000_000 mojos is 0.0005 XCH
+$sw = new-object system.diagnostics.stopwatch
+$sw.Start()
+
+$FINGERPRINT = 219821919 # fingerprint of your wallet
+$FEE = 50000000 # 50_000_000 mojos is 0.00005 XCH
 
 $WALLET_ID = 1
 $NUM = 100
-$AMOUNT = $FEE 
+$AMOUNT = $FEE
+
+# set synced wallet
+chia wallet show -f $FINGERPRINT | Out-Null
+Start-Sleep -s 5
 
 $addresses = 
     chia keys derive -f $FINGERPRINT wallet-address -n $NUM 
@@ -20,10 +27,11 @@ foreach($addr in $addresses) {
     $additions += $addition
 }
 
+$txn_fee = $FEE * $NUM # fee for send_transaction_multi transaction
 $select_coins_json = 
     @{ 
         wallet_id = $WALLET_ID
-        amount = $AMOUNT * $NUM
+        amount = ($AMOUNT * $NUM) + $txn_fee
     } | ConvertTo-Json
 
 $_select_coins_json = $select_coins_json -replace '"', '\""'
@@ -32,7 +40,7 @@ $coins = (chia rpc wallet select_coins $_select_coins_json | ConvertFrom-Json).c
 $json = @{
     wallet_id = 1
     additions = $additions
-    fee = 50000000 * $NUM # 0.00005
+    fee = $txn_fee
     coins = $coins
 } | ConvertTo-Json
 $_json = $json -replace '"', '\""'
@@ -41,3 +49,6 @@ $signed_tx = (chia rpc wallet create_signed_transaction $_json | ConvertFrom-Jso
 $signed_tx_json = $signed_tx | ConvertTo-Json -Depth 4
 $_signed_tx_json = $signed_tx_json -replace '"', '\""'
 chia rpc wallet send_transaction_multi $_signed_tx_json
+
+$sw.Stop()
+Write-Host $sw.Elapsed.TotalMinutes

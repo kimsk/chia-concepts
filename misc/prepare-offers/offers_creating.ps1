@@ -1,24 +1,24 @@
 $sw = new-object system.diagnostics.stopwatch
 $sw.Start()
 
-$OFFER_FINGERPRINT = 2159580467
+$OFFER_FINGERPRINT = 2705744614
 $OFFER_WALLET_ID = 2
 $OFFER_WALLET_ID_JSON = (@{ wallet_id = $OFFER_WALLET_ID } | ConvertTo-Json)  -replace '"', '\""'
 $AMOUNT = 1000 # one CAT is 1000 mojos
 
 $FEE_WALLET_ID_JSON = (@{ wallet_id = 1 } | ConvertTo-Json)  -replace '"', '\""'
-$FEE = 500000000
+$FEE = 50000000 # 50_000_000 mojos is 0.00005 XCH
 
 $OFFER_REQUEST_PAYLOAD = "{
     ""offer"": {""2"": -1000, ""1"": 1000000000000},
     ""fee"": $FEE
 }" -replace '"', '\""'
 
-$NUM = 26
+$NUM = 60
 $OFFER_PATH = "/mnt/e/offers/tdbx"
 # set synced wallet
 chia wallet show -f $OFFER_FINGERPRINT | Out-Null
-Start-Sleep -s 10
+Start-Sleep -s 5 
 
 for(($i=0);$i -lt $NUM;$i++)
 {
@@ -33,7 +33,7 @@ for(($i=0);$i -lt $NUM;$i++)
             $not_enough_spendable = $False
         }
 
-        Start-Sleep -s 10
+        Start-Sleep -s 5
         Write-Host "spendable_amount: $spendable_amount spendable_fee: $spendable_fee"
     }
 
