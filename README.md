@@ -3,7 +3,7 @@
 ## Basic
 - [BLS]
 - [Coins](notebooks/basic/coins/notebook.ipynb)
-- [Merkel Tree]
+- [Merkel Tree](notebooks/basic/merkel-tree/notebook.ipynb)
 - [Outer and Inner Puzzle](/notebooks/basic/outer-and-inner-puzzles/notebook.ipynb)
 
 ## Intermediate

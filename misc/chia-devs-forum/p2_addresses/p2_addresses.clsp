@@ -1,0 +1,18 @@
+(mod (PUZZLE_HASHES total_amount amount)
+    (include condition_codes.clib)
+
+    (defun pay_to (puzzle_hashes amount)
+        (if (l puzzle_hashes)
+        (c 
+            (list CREATE_COIN (f puzzle_hashes) amount)
+            (pay_to (r puzzle_hashes) amount)
+        )
+        ()
+        )
+    )
+
+    (c
+        (list ASSERT_MY_AMOUNT total_amount)
+        (pay_to PUZZLE_HASHES amount)
+    )
+)
