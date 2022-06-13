@@ -1,12 +1,12 @@
 # Verify that wallet with the $FINGERPRINT is synced
-function Wait-For-Synced-Wallet {
+function Wait-SyncedWallet {
     param(
         [Parameter()]
         [Int64] $fingerprint
     )
     $sw = new-object system.diagnostics.stopwatch
     $sw.Start()
-    Write-Host "Wait-For-Synced-Wallet: $fingerprint " -NoNewline
+    Write-Host "Wait-SyncedWallet: $fingerprint " -NoNewline
 
     chia wallet show -f $FINGERPRINT | Out-Null
 
@@ -18,14 +18,35 @@ function Wait-For-Synced-Wallet {
 
     $sw.Stop()
     Write-Host ""
-    Write-Host "Wait-For-Synced-Wallet: $($sw.Elapsed.TotalMinutes) minutes"
+    Write-Host "Wait-SyncedWallet: $($sw.Elapsed.TotalMinutes) minutes"
+}
+
+function Get-DerivedPuzzleHashes {
+    param(
+        [Parameter()]
+        [Int64] $fingerprint,
+        [Int] $num
+    )
+    $sw = new-object system.diagnostics.stopwatch
+    $sw.Start()
+    Write-Host "Get-DerivedPuzzleHashes: $fingerprint $num " -NoNewline
+
+    $puzzle_hashes = 
+        chia keys derive -f $fingerprint wallet-address -n $num 
+        | ForEach-Object { $_ -replace '(^Wallet address )(.*)(: )', "" }
+        | ForEach-Object { Write-Host "." -NoNewline; cdv decode $_ }
+
+    $sw.Stop()
+    Write-Host "Get-DerivedPuzzleHashes: $($sw.Elapsed.TotalMinutes) minutes"
+    $result = $puzzle_hashes
+    return $result
 }
 
 $sw = new-object system.diagnostics.stopwatch
 $sw.Start()
 
 $FINGERPRINT = 4108344430 # fingerprint of your wallet
-Wait-For-Synced-Wallet -fingerprint $FINGERPRINT
+Wait-SyncedWallet -fingerprint $FINGERPRINT
 
 $FEE = 50000000 # 50_000_000 mojos is 0.00005 XCH
 
@@ -33,13 +54,11 @@ $WALLET_ID = 1
 $NUM = 200 # Prepare 200 0.00005 XCH coins
 $AMOUNT = $FEE
 
-$addresses = 
-    chia keys derive -f $FINGERPRINT wallet-address -n $NUM 
-    | % { $_ -replace '(^Wallet address )(.*)(: )', "" }
+$puzzle_hashes = Get-DerivedPuzzleHashes -fingerprint $FINGERPRINT -num $NUM
 
 $additions = @()
-foreach($addr in $addresses) {
-    $puzzle_hash = cdv decode $addr
+foreach($puzzle_hash in $puzzle_hashes) {
+    
     $addition = @{
         amount = $AMOUNT
         puzzle_hash = $puzzle_hash
@@ -71,4 +90,4 @@ $_signed_tx_json = $signed_tx_json -replace '"', '\""'
 chia rpc wallet send_transaction_multi $_signed_tx_json
 
 $sw.Stop()
-Write-Host $sw.Elapsed.TotalMinutes
+Write-Host "XCH Breaking: $($sw.Elapsed.TotalMinutes)"
