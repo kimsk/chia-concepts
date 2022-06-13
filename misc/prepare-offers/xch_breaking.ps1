@@ -1,16 +1,37 @@
+# Verify that wallet with the $FINGERPRINT is synced
+function Wait-For-Synced-Wallet {
+    param(
+        [Parameter()]
+        [Int64] $fingerprint
+    )
+    $sw = new-object system.diagnostics.stopwatch
+    $sw.Start()
+    Write-Host "Wait-For-Synced-Wallet: $fingerprint " -NoNewline
+
+    chia wallet show -f $FINGERPRINT | Out-Null
+
+    do {
+        Start-Sleep -s 5
+        $sync_status = chia rpc wallet get_sync_status | ConvertFrom-Json
+        Write-Host "." -NoNewline
+    } until ($sync_status.synced) 
+
+    $sw.Stop()
+    Write-Host ""
+    Write-Host "Wait-For-Synced-Wallet: $($sw.Elapsed.TotalMinutes) minutes"
+}
+
 $sw = new-object system.diagnostics.stopwatch
 $sw.Start()
 
-$FINGERPRINT = 219821919 # fingerprint of your wallet
+$FINGERPRINT = 4108344430 # fingerprint of your wallet
+Wait-For-Synced-Wallet -fingerprint $FINGERPRINT
+
 $FEE = 50000000 # 50_000_000 mojos is 0.00005 XCH
 
 $WALLET_ID = 1
-$NUM = 100
+$NUM = 200 # Prepare 200 0.00005 XCH coins
 $AMOUNT = $FEE
-
-# set synced wallet
-chia wallet show -f $FINGERPRINT | Out-Null
-Start-Sleep -s 5
 
 $addresses = 
     chia keys derive -f $FINGERPRINT wallet-address -n $NUM 
@@ -19,7 +40,6 @@ $addresses =
 $additions = @()
 foreach($addr in $addresses) {
     $puzzle_hash = cdv decode $addr
-    Write-Host $addr $puzzle_hash
     $addition = @{
         amount = $AMOUNT
         puzzle_hash = $puzzle_hash
