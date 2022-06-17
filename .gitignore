@@ -16,6 +16,7 @@ ipython_config.py
 .local
 .bash_history
 .cache
+.python_history
 # Remove previous ipynb_checkpoints
 #   git rm -r .ipynb_checkpoints/
 
@@ -30,3 +31,24 @@ main.sym
 *.clsp.hex
 __pycache__
 .vscode
+
+# dotnet
+# Created by https://www.toptal.com/developers/gitignore/api/dotnetcore
+# Edit at https://www.toptal.com/developers/gitignore?templates=dotnetcore
+
+### DotnetCore ###
+# .NET Core build folders
+bin/
+obj/
+
+# Common node modules locations
+/node_modules
+/wwwroot/node_modules
+
+# End of https://www.toptal.com/developers/gitignore/api/dotnetcore
+
+.dotnet
+.config
+.nuget
+.wget-hsts
+.fake
