@@ -11,6 +11,7 @@
 - [jupyter-widgets/ipywidgets](https://github.com/jupyter-widgets/ipywidgets)
 
 ### Misc
+> PowerShell, C#, and F# Cell supports
 - [PowerShell](https://github.com/PowerShell/PowerShell)
 - [.NET SDK](https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu)
 - [.NET Interactive](https://github.com/dotnet/interactive)
@@ -21,7 +22,7 @@ dotnet interactive jupyter install
 - [vatlab/jupyterlab-sos](https://github.com/vatlab/jupyterlab-sos)
 
 ## Notebooks
-- [Example]()
+- [Example](./notebooks/example.ipynb)
 
 ### Basic
 - [BLS]
