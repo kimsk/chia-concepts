@@ -6,7 +6,9 @@
 
 ### JupyterLab
 - [JupyterLab](https://jupyterlab.readthedocs.io/en/stable/getting_started/overview.html)
-
+```
+pip install jupyterlab
+```
 #### Visualization
 - [jupyter-widgets/ipywidgets](https://github.com/jupyter-widgets/ipywidgets)
 
@@ -20,7 +22,9 @@ dotnet tool install Microsoft.dotnet-interactive -g
 dotnet interactive jupyter install
 ```
 - [vatlab/jupyterlab-sos](https://github.com/vatlab/jupyterlab-sos)
-
+```
+pip install jupyterlab_sos
+```
 ## Notebooks
 - [Example](./notebooks/example.ipynb)
 
