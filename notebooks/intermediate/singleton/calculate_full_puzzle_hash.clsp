@@ -1,0 +1,16 @@
+(mod (SINGLETON_STRUCT inner_puzzle_hash)
+    (include curry-and-treehash.clib)
+    (defun-inline mod_hash_for_singleton_struct (SINGLETON_STRUCT) (f SINGLETON_STRUCT))
+    ; takes a lisp tree and returns the hash of it
+    (defun sha256tree (TREE)
+      (if (l TREE)
+          (sha256 2 (sha256tree (f TREE)) (sha256tree (r TREE)))
+          (sha256 1 TREE)
+      )
+    )
+    
+    (puzzle-hash-of-curried-function (mod_hash_for_singleton_struct SINGLETON_STRUCT)
+                                      inner_puzzle_hash
+                                      (sha256tree SINGLETON_STRUCT)
+     )   
+)
