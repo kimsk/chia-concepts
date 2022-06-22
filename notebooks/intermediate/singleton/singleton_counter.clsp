@@ -1,0 +1,7 @@
+(mod (my_puzzle_hash odd_amount inner_puzzle_hash next_value)
+    (list
+        (list 51 inner_puzzle_hash odd_amount) ; CREATE_COIN
+        (list 72 my_puzzle_hash) ; ASSERT_MY_PUZZLEHASH
+        (list 73 odd_amount) ; ASSERT_MY_AMOUNT
+    )
+)

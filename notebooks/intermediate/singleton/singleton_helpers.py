@@ -12,6 +12,21 @@ from chia.wallet.puzzles import (singleton_top_layer, p2_delegated_puzzle_or_hid
 
 from clvm.casts import int_to_bytes
 
+def get_singleton_coin_spend(singleton_coin, singleton_puzzle, lineage_proof, inner_solution):
+    singleton_solution = singleton_top_layer.solution_for_singleton(
+        lineage_proof,
+        singleton_coin.amount,
+        inner_solution,
+    )
+
+    coin_spend = CoinSpend(
+        singleton_coin,
+        singleton_puzzle,
+        singleton_solution
+    )
+
+    return coin_spend
+
 def get_create_singleton_coin_spends(
         standard_txn_coin, 
         standard_txn_puzzle,
