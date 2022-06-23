@@ -1,3 +1,4 @@
+from typing import List
 import json
 def print_json(dict):
     print(json.dumps(dict, sort_keys=True, indent=4))
@@ -5,6 +6,7 @@ def print_json(dict):
 from chia.consensus.default_constants import DEFAULT_CONSTANTS
 from chia.types.blockchain_format.coin import Coin
 from chia.types.blockchain_format.program import Program
+from chia.types.coin_record import CoinRecord
 from chia.types.coin_spend import CoinSpend
 from chia.types.condition_opcodes import ConditionOpcode
 from chia.util.hash import std_hash
@@ -26,6 +28,19 @@ def get_singleton_coin_spend(singleton_coin, singleton_puzzle, lineage_proof, in
     )
 
     return coin_spend
+
+async def get_unspent_singleton(get_coin_records_by_parent_ids, launcher_id):
+    parent_coin_id = launcher_id
+    while parent_coin_id != None:
+        coin_records: List[CoinRecord] = await get_coin_records_by_parent_ids([parent_coin_id], include_spent_coins = True) 
+        singleton: CoinRecord = next(cr for cr in coin_records if cr.coin.amount%2 != 0)
+
+        if singleton != None:
+            if singleton.spent_block_index == 0:
+                return singleton.coin
+            parent_coin_id = singleton.coin.name()
+        else:
+            parent_coin_id = None
 
 def get_create_singleton_coin_spends(
         standard_txn_coin, 
