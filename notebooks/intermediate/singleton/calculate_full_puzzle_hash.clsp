@@ -1,3 +1,4 @@
+; https://github.com/Chia-Network/chia-blockchain/blob/1.3.5/chia/wallet/puzzles/singleton_top_layer.clvm#L43
 (mod (SINGLETON_STRUCT inner_puzzle_hash)
     (include curry-and-treehash.clib)
     (defun-inline mod_hash_for_singleton_struct (SINGLETON_STRUCT) (f SINGLETON_STRUCT))
