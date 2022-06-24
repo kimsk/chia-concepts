@@ -18,6 +18,18 @@ genesis_challenge = config["farmer"]["network_overrides"]["constants"][selected_
 self_hostname = config["self_hostname"] # localhost
 full_node_rpc_port = config["full_node"]["rpc_port"] # 8555
 
+async def get_blockchain_state_async():
+    try:
+        full_node_client = await FullNodeRpcClient.create(
+                self_hostname, uint16(full_node_rpc_port), DEFAULT_ROOT_PATH, config
+            )
+        state = await full_node_client.get_blockchain_state()
+        return state
+    finally:
+        full_node_client.close()
+        await full_node_client.await_closed()
+
+
 async def get_coin_records_by_puzzle_hash_async(puzzle_hash: bytes32):
     try:
         full_node_client = await FullNodeRpcClient.create(

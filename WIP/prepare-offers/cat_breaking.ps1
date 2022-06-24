@@ -1,11 +1,46 @@
+function Wait-For-Enough-Spendable {
+    param(
+		[Parameter()]
+		[int] $WalletId,
+        [int] $FeeWalletId
+	)
+    $wallet_id_json = (@{ wallet_id = $WalletId } | ConvertTo-Json)  -replace '"', '\""'
+    $fee_wallet_id_json = (@{ wallet_id = $fee_wallet_id } | ConvertTo-Json)  -replace '"', '\""'
+
+    $sw = new-object system.diagnostics.stopwatch
+    $sw.Start()
+    $not_enough_spendable = $True
+    while($not_enough_spendable){
+        $spendable_amount = (chia rpc wallet get_wallet_balance $wallet_id_json | ConvertFrom-Json).wallet_balance.spendable_balance
+        $not_enough_amount =  $spendable_amount -lt $AMOUNT
+        $spendable_fee = (chia rpc wallet get_wallet_balance $fee_wallet_id_json | ConvertFrom-Json).wallet_balance.spendable_balance
+        $not_enough_fee =  $spendable_fee -lt $FEE
+        if($not_enough_amount -or $not_enough_fee){
+            Start-Sleep -s 5
+            Write-Host "." -NoNewline
+        }
+        else {
+            $not_enough_spendable = $False
+            Write-Host ""
+            Write-Host "spendable_amount: $spendable_amount spendable_fee: $spendable_fee"
+        }
+    }
+    $sw.Stop()
+    Write-Host "Wait-For-Enough-Spendable: $($sw.Elapsed.TotalMinutes) minutes"
+}
+
+function Spend-CAT {
+    param(
+        
+    )
+}
+
 $sw = new-object system.diagnostics.stopwatch
 $sw.Start()
 
 $FINGERPRINT = 219821919
 $WALLET_ID = 2
-$WALLET_ID_JSON = (@{ wallet_id = $WALLET_ID } | ConvertTo-Json)  -replace '"', '\""'
 $FEE = 50000000 # 50_000_000 mojos is 0.00005 XCH
-$FEE_WALLET_ID_JSON = (@{ wallet_id = 1 } | ConvertTo-Json)  -replace '"', '\""'
 $AMOUNT = 1000 # one CAT is 1000 mojos
 
 # set synced wallet
@@ -33,21 +68,8 @@ for ($i=1;$i -lt $bin_count;$i++){
     for($j=0;$j -lt $count;$j++) {
         $idx = $start + $j
         Write-Host "$idx : $amt to $($addresses[$j])" 
-    
-        $not_enough_spendable = $True
-        while($not_enough_spendable){
-            $spendable_amount = (chia rpc wallet get_wallet_balance $WALLET_ID_JSON | ConvertFrom-Json).wallet_balance.spendable_balance
-            $not_enough_amount =  $spendable_amount -lt $AMOUNT
-            $spendable_fee = (chia rpc wallet get_wallet_balance $FEE_WALLET_ID_JSON | ConvertFrom-Json).wallet_balance.spendable_balance
-            $not_enough_fee =  $spendable_fee -lt $FEE
-            if($not_enough_amount -or $not_enough_fee){
-                Start-Sleep -s 5
-                Write-Host "spendable_amount: $spendable_amount spendable_fee: $spendable_fee"
-            }
-            else {
-                $not_enough_spendable = $False
-            }
-        }
+
+        Wait-For-Enough-Spendable -WalletId 2 -FeeWalletId 1
 
         $address = $addresses[$j]
         $cat_spend_json = (@{
@@ -71,11 +93,6 @@ $sw_2.Start()
 $FROM_FINGERPRINT = $FINGERPRINT # CAT wallet
 $TO_ADDRESS = "txch1qt5p7e5fcnpw9xglt4qtuqkvl5fuy6ddna34vnawyf2xhnzlgf9qfll709" # wallet to create offers
 $FROM_WALLET_ID = $WALLET_ID
-# $WALLET_ID_JSON = (@{ wallet_id = $FROM_WALLET_ID } | ConvertTo-Json)  -replace '"', '\""'
-# $FEE = 50000000 # 50_000_000 mojos is 0.00005 XCH
-# $FEE_WALLET_ID_JSON = (@{ wallet_id = 1 } | ConvertTo-Json)  -replace '"', '\""'
-# $NUM = 30
-# $AMOUNT = 1000 # one CAT is 1000 mojos
 
 # set synced wallet
 chia wallet show -f $FROM_FINGERPRINT | Out-Null
@@ -84,18 +101,7 @@ Start-Sleep -s 5
 # break coin
 for(($i=0);$i -lt $NUM;$i++)
 {
-    $not_enough_spendable = $True
-    while($not_enough_spendable){
-        $spendable_amount = (chia rpc wallet get_wallet_balance $WALLET_ID_JSON | ConvertFrom-Json).wallet_balance.spendable_balance
-        $enough_amount =  $spendable_amount -ge $AMOUNT
-        $spendable_fee = (chia rpc wallet get_wallet_balance $FEE_WALLET_ID_JSON | ConvertFrom-Json).wallet_balance.spendable_balance
-        $enough_fee =  $spendable_fee -ge $FEE
-        if($enough_amount -and $enough_fee){
-            $not_enough_spendable = $False
-        }
-        Start-Sleep -s 5
-        Write-Host "spendable_amount: $spendable_amount spendable_fee: $spendable_fee"
-    }
+    Wait-For-Enough-Spendable -WalletId $FROM_WALLET_ID -FeeWalletId 1
 
     $cat_spend_json = (@{ 
         fingerprint = $FROM_FINGERPRINT
