@@ -36,7 +36,8 @@ pip install jupyterlab_sos
 
 ### Intermediate
 - [DIDs]
-- [Singletons](notebooks/intermediate/singleton/notebook.ipynb)
+- [Singleton](notebooks/intermediate/singleton/notebook.ipynb)
+    - [Singleton Counter](notebooks/intermediate/singleton/singleton_counter.ipynb)
 - [Standard Transaction](notebooks/intermediate/standard-transaction/notebook.ipynb)
 - [Pooling](notebooks/intermediate/pooling/notebook.ipynb)
 
@@ -45,7 +46,6 @@ pip install jupyterlab_sos
 - [DataLayer]
 - [NFT]
 - [Offers]
-- []
 
 
 ## Notes (WIP)

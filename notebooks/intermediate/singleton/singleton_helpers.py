@@ -14,6 +14,21 @@ from chia.wallet.puzzles import (singleton_top_layer, p2_delegated_puzzle_or_hid
 
 from clvm.casts import int_to_bytes
 
+async def get_launcher_coin_by_comment(get_block_records, get_additions_and_removals, get_puzzle_and_solution, comment):
+    block_records = await get_block_records(0, 20)
+    header_hashes = list(map(lambda br: br.header_hash, block_records))
+    for header_hash in header_hashes:
+        _, removals = await get_additions_and_removals(header_hash)
+        launchers = list(filter(lambda cr: cr.coin.puzzle_hash == singleton_top_layer.SINGLETON_LAUNCHER_HASH, removals))
+        for cr in launchers:
+            coin_id = cr.coin.name()
+            coin_spent = await get_puzzle_and_solution(coin_id, cr.spent_block_index)
+            solutions = list(coin_spent.solution.to_program().as_iter())
+            kv = coin_spent.solution.to_program().at("rrf")
+            if kv == Program.to(comment):
+                return cr.coin
+    return None
+
 async def get_unspent_singleton(get_coin_records_by_parent_ids, launcher_id):
     parent_coin_id = launcher_id
     while parent_coin_id != None:
