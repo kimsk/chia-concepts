@@ -31,7 +31,7 @@ pip install jupyterlab_sos
 ### Basic
 - [BLS]
 - [Coins](notebooks/basic/coins/notebook.ipynb)
-- [Merkel Tree](notebooks/basic/merkel-tree/notebook.ipynb)
+- [Merkel Tree]
 - [Outer and Inner Puzzle](/notebooks/basic/outer-and-inner-puzzles/notebook.ipynb)
 
 ### Intermediate
@@ -39,23 +39,10 @@ pip install jupyterlab_sos
 - [Singleton](notebooks/intermediate/singleton/notebook.ipynb)
     - [Singleton Counter](notebooks/intermediate/singleton/singleton_counter.ipynb)
 - [Standard Transaction](notebooks/intermediate/standard-transaction/notebook.ipynb)
-- [Pooling](notebooks/intermediate/pooling/notebook.ipynb)
+- [Pooling]
 
 ### Advanced
 - [Chia Asset Tokens (CATs)]
 - [DataLayer]
 - [NFT]
 - [Offers]
-
-
-## Notes (WIP)
-
-- [Coins]
-- [BLS](BLS/README.md)
-- [Standard Transaction](./Standard%20Transaction/README.md)
-- [Merkel Tree](./Merkel%20Tree/README.md)
-- [Singletons](./Singletons/README.md)
-- [Chia Asset Tokens (CATs)]
-- [DIDs](DIDs/README.md)
-- [Offers]
-- [Pooling]
