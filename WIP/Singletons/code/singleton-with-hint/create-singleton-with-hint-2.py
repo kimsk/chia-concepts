@@ -256,4 +256,33 @@ eve_spend_bundle = SpendBundle(
 #     }
 # }
 
-
+# ❯ chia rpc full_node get_coin_records_by_parent_ids '{\"include_spent_coins\": true, \"parent_ids\": [\"0xfb6762bdf3e78d0b4979366c5805ce1e0f78052c643dc0ac43781b2d53edf6ec\", \"0xb3c911ef11cc78f6cc86277cbbd43e6be3a01986f88a97a00556b856e09e6b27\"]}'
+# {
+#     "coin_records": [
+#         {
+#             "coin": {
+#                 "amount": 1023,
+#                 "parent_coin_info": "0xfb6762bdf3e78d0b4979366c5805ce1e0f78052c643dc0ac43781b2d53edf6ec",
+#                 "puzzle_hash": "0x1f8bc8c41b16efed4d067fd0927a018a228b4ef83e6767553e8a8798b00b0c4d"
+#             },
+#             "coinbase": false,
+#             "confirmed_block_index": 921058,
+#             "spent": true,
+#             "spent_block_index": 937722,
+#             "timestamp": 1651572021
+#         },
+#         {
+#             "coin": {
+#                 "amount": 1023,
+#                 "parent_coin_info": "0xb3c911ef11cc78f6cc86277cbbd43e6be3a01986f88a97a00556b856e09e6b27",
+#                 "puzzle_hash": "0x1f8bc8c41b16efed4d067fd0927a018a228b4ef83e6767553e8a8798b00b0c4d"
+#             },
+#             "coinbase": false,
+#             "confirmed_block_index": 937722,
+#             "spent": false,
+#             "spent_block_index": 0,
+#             "timestamp": 1651863491
+#         }
+#     ],
+#     "success": true
+# }

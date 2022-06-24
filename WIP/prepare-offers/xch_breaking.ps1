@@ -1,22 +1,25 @@
-. ./chia_functions.ps1
-
 $sw = new-object system.diagnostics.stopwatch
 $sw.Start()
 
 $FINGERPRINT = 4108344430 # fingerprint of your wallet
-Wait-SyncedWallet -fingerprint $FINGERPRINT
-
 $FEE = 50000000 # 50_000_000 mojos is 0.00005 XCH
 
 $WALLET_ID = 1
-$NUM = 200 # Prepare 200 0.00005 XCH coins
+$NUM = 2 
 $AMOUNT = $FEE
 
-$puzzle_hashes = Get-DerivedPuzzleHashes -fingerprint $FINGERPRINT -num $NUM
+# set synced wallet
+chia wallet show -f $FINGERPRINT | Out-Null
+Start-Sleep -s 5
+
+$addresses = 
+    chia keys derive -f $FINGERPRINT wallet-address -n $NUM 
+    | % { $_ -replace '(^Wallet address )(.*)(: )', "" }
 
 $additions = @()
-foreach($puzzle_hash in $puzzle_hashes) {
-    
+foreach($addr in $addresses) {
+    $puzzle_hash = cdv decode $addr
+    Write-Host $addr $puzzle_hash
     $addition = @{
         amount = $AMOUNT
         puzzle_hash = $puzzle_hash
@@ -40,6 +43,7 @@ $json = @{
     fee = $txn_fee
     coins = $coins
 } | ConvertTo-Json
+Write-Host $json
 $_json = $json -replace '"', '\""'
 
 $signed_tx = (chia rpc wallet create_signed_transaction $_json | ConvertFrom-Json).signed_tx
@@ -48,4 +52,4 @@ $_signed_tx_json = $signed_tx_json -replace '"', '\""'
 chia rpc wallet send_transaction_multi $_signed_tx_json
 
 $sw.Stop()
-Write-Host "XCH Breaking: $($sw.Elapsed.TotalMinutes)"
+Write-Host $sw.Elapsed.TotalMinutes

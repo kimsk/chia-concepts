@@ -1,3 +1,13 @@
+# PowerShell object to Json for chia rpc
+function Edit-ChiaRpcJson {
+    [CmdletBinding()]
+    param (
+        [Parameter(ValueFromPipeline)]
+        [string] $Json
+    )
+    $Json -replace '"', '\""'
+}
+
 # Verify that wallet with the $FINGERPRINT is synced
 function Wait-SyncedWallet {
     param(
@@ -43,6 +53,7 @@ function Get-DerivedPuzzleHashes {
     return $result
 }
 
+# Wait until spendable is greater or equal to the amount
 function Wait-EnoughSpendable {
     param(
 		[Parameter()]
@@ -50,7 +61,11 @@ function Wait-EnoughSpendable {
         [int64] $Amount
 	)
     Write-Host "Wait-EnoughSpendable: $WalletId $Amount " -NoNewline
-    $wallet_id_json = (@{ wallet_id = $WalletId } | ConvertTo-Json)  -replace '"', '\""'
+    $wallet_id_json = 
+        @{ wallet_id = $WalletId } 
+        | ConvertTo-Json
+        | Edit-ChiaRpcJson
+
 
     $sw = new-object system.diagnostics.stopwatch
     $sw.Start()
@@ -64,4 +79,30 @@ function Wait-EnoughSpendable {
     Write-Host "Wait-EnoughSpendable: Spendable: $spendable_amount"
     $sw.Stop()
     Write-Host "Wait-EnoughSpendable: $($sw.Elapsed.TotalMinutes) minutes"
+}
+
+# Get coins to spend
+function Get-Coins {
+    param(
+		[Parameter()]
+		[int] $WalletId,
+        [int64] $Amount,
+        [int64] $Fee = 0
+	)
+    $json = @{ 
+        wallet_id = $WALLET_ID
+        amount = $Amount + $Fee
+    }
+    | ConvertTo-Json
+    | Edit-ChiaRpcJson
+
+    $result = chia rpc wallet select_coins $json 2>&1
+    if ($result -like "Request failed:*"){
+        # $match = select-string "Request failed: (.*)" -inputobject $result
+        # $error_json = $match.Matches.groups[1].value -replace "'", """"
+        throw $result
+    } else {
+        # success
+        $result | ConvertFrom-Json
+    }
 }
