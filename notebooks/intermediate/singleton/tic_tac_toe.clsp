@@ -22,7 +22,21 @@
     (defconstant p7 (f (r (f (r (r 1))))))
     (defconstant p8 (f (r (r (f (r (r 1)))))))
 
-    (list 
+    (defconstant p00 (qq (unquote r0)))
+
+    (defun-inline get_r0 (board)
+        (f board)
+    )
+
+    (defun-inline get_p0 (board)
+        (f (get_r0 board))
+    )
+
+    (list
+        (get_p0 board)
+        (get_r0 board)
+        (a (qq (unquote r0)) board)
+        (a (qq (f (unquote r0))) board)
         (list 
             (a r0 board)
             (a r1 board)
