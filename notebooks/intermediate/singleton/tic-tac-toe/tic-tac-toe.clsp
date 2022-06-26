@@ -1,0 +1,20 @@
+(mod (board (pos v))
+    (include tic-tac-toe.clib)
+    ; (
+    ;     0 1 2
+    ;     3 4 5
+    ;     6 7 8
+    ; )
+
+    (list
+        ; (list board pos v) ; cost = 456
+        ; (new-board board pos v) ; cost = 23222
+        ; (new-board-rec board 0 pos v) ; cost = 22575
+        ; (check-board board v) ; cost = 26567
+
+        (check-board
+            (new-board-rec board 0 pos v)
+            v
+        ) ; cost = 48837
+    )
+)
