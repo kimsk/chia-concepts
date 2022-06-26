@@ -8,12 +8,22 @@
 
     (list
         ; (list p0 p1 p2 p3 p4 p5 p6 p7 p8 pos v)
-        ; (new-board p0 p1 p2 p3 p4 p5 p6 p7 p8 pos v)
+        
+        ; (new-board p0 p1 p2 p3 p4 p5 p6 p7 p8 pos v) 
+        ; cost = 7031
+        ; 0.15user 0.01system 0:00.16elapsed 100%CPU (0avgtext+0avgdata 22916maxresident)k
+        ; 0inputs+0outputs (0major+3576minor)pagefaults 0swaps
+        
+        (new-board-2 p0 p1 p2 p3 p4 p5 p6 p7 p8 pos v)
+        ; cost = 25353
+        ; 0.17user 0.01system 0:00.18elapsed 100%CPU (0avgtext+0avgdata 22876maxresident)k
+        ; 0inputs+0outputs (0major+3947minor)pagefaults 0swaps
+
         ; (new-board-rec (list p0 p1 p2 p3 p4 p5 p6 p7 p8) 0 pos v)
         ; (check-board (list p0 p1 p2 p3 p4 p5 p6 p7 p8) v)
-        (check-board
-            (new-board p0 p1 p2 p3 p4 p5 p6 p7 p8 pos v)
-            v
-        ) 
+        ; (check-board
+        ;     (new-board p0 p1 p2 p3 p4 p5 p6 p7 p8 pos v)
+        ;     v
+        ; ) 
     )
 )
