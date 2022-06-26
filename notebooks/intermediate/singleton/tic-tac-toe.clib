@@ -1,0 +1,47 @@
+(
+    (defun new-board (p0 p1 p2 p3 p4 p5 p6 p7 p8 pos v)
+        (list
+            (if (= 0 pos) v p0)
+            (if (= 1 pos) v p1)
+            (if (= 2 pos) v p2)
+            (if (= 3 pos) v p3)
+            (if (= 4 pos) v p4)
+            (if (= 5 pos) v p5)
+            (if (= 6 pos) v p6)
+            (if (= 7 pos) v p7)
+            (if (= 8 pos) v p8) 
+        )
+    )
+
+    (defun check-line (v0 v1 v2 v)
+        (if
+            (all
+                (= v0 v)
+                (= v1 v)
+                (= v2 v)
+            )
+            1
+            0
+        )
+    )
+
+    (defun check-board ((p0 p1 p2 p3 p4 p5 p6 p7 p8) v)
+        (if 
+            (any
+                ; horizontal
+                (check-line p0 p1 p2 v)
+                (check-line p3 p4 p5 v)
+                (check-line p6 p7 p8 v)
+                ; vertical
+                (check-line p0 p3 p6 v)
+                (check-line p1 p4 p7 v)
+                (check-line p2 p5 p8 v)
+                ; diaganol
+                (check-line p0 p4 p8 v)
+                (check-line p2 p4 p6 v)
+            )
+            1
+            0
+        )
+    )
+)
