@@ -2,10 +2,16 @@
     (defun new-board-rec (board count pos v)
         (if (l board)
             (c
-                (if (= count pos) v (f board)) 
+                (if (= count pos) 
+                    (if (= 0 (f board))
+                        v
+                        (x)
+                    )
+                    (f board)
+                ) 
                 (new-board-rec (r board) (+ count 1) pos v)
             )
-            ()
+            () 
         )
     )
 
