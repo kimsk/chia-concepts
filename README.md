@@ -28,6 +28,10 @@ pip install jupyterlab_sos
 ## Notebooks
 - [Example](./notebooks/example.ipynb)
 
+### CLVM
+- [Dive into CLVM](notebooks/clvm/dive-into-CLVM.ipynb)
+
+
 ### Basic
 - [BLS]
 - [Coins](notebooks/basic/coins/notebook.ipynb)
