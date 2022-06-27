@@ -1,4 +1,17 @@
 (   
+    ; (
+    ;     0 1 2
+    ;     3 4 5
+    ;     6 7 8
+    ; )
+
+    (defun sha256tree (TREE)
+        (if (l TREE)
+            (sha256 2 (sha256tree (f TREE)) (sha256tree (r TREE)))
+            (sha256 1 TREE)
+        )
+    )
+
     (defun new-board-rec (board count pos v)
         (if (l board)
             (c
