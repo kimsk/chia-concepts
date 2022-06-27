@@ -6,13 +6,23 @@
     ;     6 7 8
     ; )
 
+    (defun check-new-board (new_board v)
+        (list
+            (check-board
+                new_board
+                v
+            )
+            new_board
+        )
+    )
+
     (list
         ; (list board pos v) ; cost = 456
         ; (new-board board pos v) ; cost = 23222
         ; (new-board-rec board 0 pos v) ; cost = 22575
         ; (check-board board v) ; cost = 26567
 
-        (check-board
+        (check-new-board
             (new-board-rec board 0 pos v)
             v
         ) ; cost = 48837
