@@ -5,14 +5,7 @@
     ;     6 7 8
     ; )
 
-    (defun sha256tree (TREE)
-        (if (l TREE)
-            (sha256 2 (sha256tree (f TREE)) (sha256tree (r TREE)))
-            (sha256 1 TREE)
-        )
-    )
-
-    (defun new-board-rec (board count pos v)
+    (defun new-board-rec (board v count pos)
         (if (l board)
             (c
                 (if (= count pos) 
@@ -22,15 +15,17 @@
                     )
                     (f board)
                 ) 
-                (new-board-rec (r board) (+ count 1) pos v)
+                (new-board-rec 
+                    (r board) v (+ count 1) pos
+                )
             )
             () 
         )
     )
 
-    (defun new-board (board pos v)
+    (defun new-board (board v pos)
         (new-board-rec 
-            board 0 pos v
+            board v count pos
         )
     )
 

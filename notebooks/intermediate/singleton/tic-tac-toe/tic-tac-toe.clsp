@@ -1,22 +1,18 @@
-(mod (BOARD_HASH board (pos v))
+(mod (BOARD V pos)
     (include tic-tac-toe.clib)
 
-    (defun check-new-board (new_board v)
+    (defun check-new-board (new_board V)
         (list
             (check-board
                 new_board
-                v
+                V
             )
             new_board
         )
     )
 
-    (if (= BOARD_HASH (sha256tree board))
-        (check-new-board
-            (new-board-rec board 0 pos v)
-            v
-        )
-        (x)
+    (check-new-board
+        (new-board-rec BOARD V 0 pos)
+        V
     )
-    
 )
