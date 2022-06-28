@@ -11,22 +11,12 @@
         )
     )
 
-    (list
-        ; (list board pos v) ; cost = 456
-        ; (new-board board pos v) ; cost = 23222
-        ; (new-board-rec board 0 pos v) ; cost = 22575
-        ; (check-board board v) ; cost = 26567
-
-        ; (check-new-board
-        ;     (new-board-rec board 0 pos v)
-        ;     v
-        ; ) ; cost = 49973
-        (if (= BOARD_HASH (sha256tree board))
-            (check-new-board
-                (new-board-rec board 0 pos v)
-                v
-            )
-            (x)
+    (if (= BOARD_HASH (sha256tree board))
+        (check-new-board
+            (new-board-rec board 0 pos v)
+            v
         )
+        (x)
     )
+    
 )
