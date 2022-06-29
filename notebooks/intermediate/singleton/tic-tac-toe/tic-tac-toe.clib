@@ -11,7 +11,7 @@
                 (if (= count pos) 
                     (if (= 0 (f board))
                         v
-                        (x)
+                        (x "update error")
                     )
                     (f board)
                 ) 

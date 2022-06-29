@@ -20,9 +20,12 @@ def get_curried_tic_tac_toe_puzzle(tic_tac_toe_puzzle, board, player):
         Program.to(board), 
         int_to_bytes(player)
     )
+
+def get_tic_tac_toe_solution(position):
+    return Program.to([position])
     
 def play(curried_tic_tac_toe_puzzle, position):
-    solution = Program.to([position])
+    solution = get_tic_tac_toe_solution(position)
     run_result = curried_tic_tac_toe_puzzle.run(solution)
     return get_play_result(run_result)
 
