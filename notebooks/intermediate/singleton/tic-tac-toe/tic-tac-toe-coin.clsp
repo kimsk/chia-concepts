@@ -1,4 +1,4 @@
-(mod (TIC_TAC_TOE_PUZZLE curried_tic_tac_toe_puzzle position next_v)
+(mod (TIC_TAC_TOE_PUZZLE CURRIED_TIC_TAC_TOE_PUZZLE position next_v)
     (defun sha256tree (TREE)
       (if (l TREE)
           (sha256 2 (sha256tree (f TREE)) (sha256tree (r TREE)))
@@ -19,13 +19,20 @@
     )
 
     ;; puzzle hash of the next curried_tic_tac_toe_puzzle
-    (sha256tree
-        (curry 
-            TIC_TAC_TOE_PUZZLE 
-            (list 
-                (f (r (a curried_tic_tac_toe_puzzle (list position)))) 
-                next_v
-            )
+    ; (sha256tree
+    ;     (curry 
+    ;         TIC_TAC_TOE_PUZZLE 
+    ;         (list 
+    ;             (f (r (a CURRIED_TIC_TAC_TOE_PUZZLE (list position)))) 
+    ;             next_v
+    ;         )
+    ;     )
+    ; )
+    (curry 
+        TIC_TAC_TOE_PUZZLE 
+        (list 
+            (f (r (a CURRIED_TIC_TAC_TOE_PUZZLE (list position)))) 
+            next_v
         )
     )
 )
