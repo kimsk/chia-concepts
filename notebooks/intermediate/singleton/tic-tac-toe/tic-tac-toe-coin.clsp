@@ -1,4 +1,6 @@
-(mod (MOD TIC_TAC_TOE_PUZZLE CURRIED_TIC_TAC_TOE_PUZZLE position next_v)
+(mod (MOD TIC_TAC_TOE_PUZZLE CURRIED_TIC_TAC_TOE_PUZZLE odd_amount position next_v)
+    (include condition_codes.clib)
+
     (defun sha256tree (TREE)
       (if (l TREE)
           (sha256 2 (sha256tree (f TREE)) (sha256tree (r TREE)))
@@ -18,35 +20,30 @@
         (qq (a (q . (unquote func)) (unquote (fix_curry_args list_of_args (q . 1)))))
     )
 
-    ;; puzzle hash of the next curried_tic_tac_toe_puzzle
-    ; (sha256tree
-    ;     (curry 
-    ;         TIC_TAC_TOE_PUZZLE 
-    ;         (list 
-    ;             (f (r (a CURRIED_TIC_TAC_TOE_PUZZLE (list position)))) 
-    ;             next_v
-    ;         )
-    ;     )
-    ; )
-    ; (curry
-    ;     TIC_TAC_TOE_PUZZLE 
-    ;     (list 
-    ;         (f (r (a CURRIED_TIC_TAC_TOE_PUZZLE (list position)))) 
-    ;         next_v
-    ;     )
-    ; )
-    (curry
-        MOD
+    (defun create_coinditions (puzzle_hash odd_amount)
         (list
-            MOD
-            TIC_TAC_TOE_PUZZLE
+            (list ASSERT_MY_AMOUNT odd_amount)
+            (list CREATE_COIN puzzle_hash odd_amount)
+        )
+    )
+    (create_coinditions
+        ; puzzle_hash
+        (sha256tree
             (curry
-                TIC_TAC_TOE_PUZZLE 
-                (list 
-                    (f (r (a CURRIED_TIC_TAC_TOE_PUZZLE (list position)))) 
-                    next_v
+                MOD
+                (list
+                    MOD
+                    TIC_TAC_TOE_PUZZLE
+                    (curry
+                        TIC_TAC_TOE_PUZZLE 
+                        (list 
+                            (f (r (a CURRIED_TIC_TAC_TOE_PUZZLE (list position)))) 
+                            next_v
+                        )
+                    )
                 )
             )
         )
+        odd_amount
     )
 )
