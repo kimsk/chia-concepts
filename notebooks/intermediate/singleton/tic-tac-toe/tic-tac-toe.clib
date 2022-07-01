@@ -41,7 +41,7 @@
         )
     )
 
-    (defun check-board ((p0 p1 p2 p3 p4 p5 p6 p7 p8) v)
+    (defun check-winning-board ((p0 p1 p2 p3 p4 p5 p6 p7 p8) v)
         (if 
             (any
                 ; horizontal
@@ -56,8 +56,28 @@
                 (check-line p0 p4 p8 v)
                 (check-line p2 p4 p6 v)
             )
-            1
+            v
             0
         )
+    )
+
+    (defun check-board ((p0 p1 p2 p3 p4 p5 p6 p7 p8) v)
+        (if
+            ; check if there is no playable position left
+            (all
+                (not (= p0 0))
+                (not (= p1 0))
+                (not (= p2 0))
+                (not (= p3 0))
+                (not (= p4 0))
+                (not (= p5 0))
+                (not (= p6 0))
+                (not (= p7 0))
+                (not (= p8 0))
+            ) 
+            -1
+            (check-winning-board (list p0 p1 p2 p3 p4 p5 p6 p7 p8) v)
+        )
+
     )
 )

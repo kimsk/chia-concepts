@@ -29,11 +29,16 @@ def play(curried_tic_tac_toe_puzzle, position):
     run_result = curried_tic_tac_toe_puzzle.run(solution)
     return get_play_result(run_result)
 
+# board_state
+# -1 unplayable
+#  0 playable
+#  1 player 1 wins
+#  2 player 2 wins
 def get_play_result(run_result):
-    is_winning = bool(run_result.at("f").as_int())
+    board_state = run_result.at("f").as_int()
     run_result_list = run_result.at("rf").as_atom_list()
     result_board = list(
         map(lambda b: int.from_bytes(b, "little"), run_result_list)
     )
-    return (is_winning, result_board)
+    return (board_state, result_board)
 
