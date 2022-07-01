@@ -20,19 +20,19 @@
         (qq (a (q . (unquote func)) (unquote (fix_curry_args list_of_args (q . 1)))))
     )
 
-    (defun create-coinditions (puzzle_hash odd_amount)
+    (defun create-conditions (puzzle_hash odd_amount)
         (list
             (list ASSERT_MY_AMOUNT odd_amount)
             (list CREATE_COIN puzzle_hash odd_amount)
         )
     )
 
-    (defun check-if-winning (MOD TIC_TAC_TOE_PUZZLE odd_amount next_v play_result)
-        (if (= 1 (f play_result))
+    (defun check-board (MOD TIC_TAC_TOE_PUZZLE odd_amount next_v play_result)
+        (if (not (= 0 (f play_result)))
             (list
                 (list CREATE_COIN 0x900ddeed -113)
             )
-            (create-coinditions
+            (create-conditions
                 ; puzzle_hash
                 (sha256tree
                     (curry
@@ -55,7 +55,7 @@
         )
     )
 
-    (check-if-winning
+    (check-board
         MOD 
         TIC_TAC_TOE_PUZZLE
         odd_amount
