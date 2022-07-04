@@ -29,12 +29,17 @@
 
     (defun check-board (MOD PLAYER_ONE_HASH PLAYER_TWO_HASH TIC_TAC_TOE_PUZZLE odd_amount next_v (play_result next_board))
         (if (not (= 0 play_result))
-            (list
-                (if (= 1 play_result)
-                    (list CREATE_COIN PLAYER_ONE_HASH odd_amount)
-                    (list CREATE_COIN PLAYER_TWO_HASH odd_amount)
-                )
+            (c
                 (list CREATE_COIN 0x900ddeed -113)
+                (if (= -1 play_result)
+                    ()
+                    (list
+                        (if (= 1 play_result)
+                            (list CREATE_COIN PLAYER_ONE_HASH odd_amount)
+                            (list CREATE_COIN PLAYER_TWO_HASH odd_amount)
+                        )
+                    )
+                )
             )
             (create-conditions
                 ; puzzle_hash

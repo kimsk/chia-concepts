@@ -42,3 +42,24 @@ def get_play_result(run_result):
     )
     return (board_state, result_board)
 
+
+def get_curried_tic_tac_toe_puzzles(
+    tic_tac_toe_coin_puzzle,
+    player_one_hash,
+    player_two_hash,
+    tic_tac_toe_puzzle,
+    board, 
+    player):
+    curried_tic_tac_toe_puzzle = get_curried_tic_tac_toe_puzzle(
+        tic_tac_toe_puzzle, 
+        board, 
+        player
+    )
+    curried_tic_tac_toe_coin_puzzle = tic_tac_toe_coin_puzzle.curry(
+        tic_tac_toe_coin_puzzle,
+        player_one_hash,
+        player_two_hash,
+        tic_tac_toe_puzzle, 
+        curried_tic_tac_toe_puzzle
+    )
+    return curried_tic_tac_toe_puzzle, curried_tic_tac_toe_coin_puzzle
