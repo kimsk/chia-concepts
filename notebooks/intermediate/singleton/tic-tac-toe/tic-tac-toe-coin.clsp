@@ -1,4 +1,4 @@
-(mod (MOD TIC_TAC_TOE_PUZZLE CURRIED_TIC_TAC_TOE_PUZZLE odd_amount position next_v)
+(mod (MOD PLAYER_ONE_HASH PLAYER_TWO_HASH TIC_TAC_TOE_PUZZLE CURRIED_TIC_TAC_TOE_PUZZLE odd_amount position next_v)
     (include condition_codes.clib)
 
     (defun sha256tree (TREE)
@@ -27,9 +27,13 @@
         )
     )
 
-    (defun check-board (MOD TIC_TAC_TOE_PUZZLE odd_amount next_v play_result)
-        (if (not (= 0 (f play_result)))
+    (defun check-board (MOD PLAYER_ONE_HASH PLAYER_TWO_HASH TIC_TAC_TOE_PUZZLE odd_amount next_v (play_result next_board))
+        (if (not (= 0 play_result))
             (list
+                (if (= 1 play_result)
+                    (list CREATE_COIN PLAYER_ONE_HASH odd_amount)
+                    (list CREATE_COIN PLAYER_TWO_HASH odd_amount)
+                )
                 (list CREATE_COIN 0x900ddeed -113)
             )
             (create-conditions
@@ -39,11 +43,13 @@
                         MOD
                         (list
                             MOD
+                            PLAYER_ONE_HASH
+                            PLAYER_TWO_HASH
                             TIC_TAC_TOE_PUZZLE
                             (curry
                                 TIC_TAC_TOE_PUZZLE 
                                 (list 
-                                    (f (r play_result)) 
+                                    next_board
                                     next_v
                                 )
                             )
@@ -56,7 +62,9 @@
     )
 
     (check-board
-        MOD 
+        MOD
+        PLAYER_ONE_HASH
+        PLAYER_TWO_HASH 
         TIC_TAC_TOE_PUZZLE
         odd_amount
         next_v
