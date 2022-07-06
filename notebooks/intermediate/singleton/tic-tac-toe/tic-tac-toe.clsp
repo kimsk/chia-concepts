@@ -12,7 +12,7 @@
     )
 
     (check-new-board
-        (new-board-rec BOARD V 0 pos)
+        (new-board BOARD V pos)
         V
     )
 )

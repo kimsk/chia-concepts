@@ -11,7 +11,7 @@
                 (if (= count pos) 
                     (if (= 0 (f board))
                         v
-                        (x "update error")
+                        (x "position already occupied")
                     )
                     (f board)
                 ) 
@@ -24,8 +24,14 @@
     )
 
     (defun new-board (board v pos)
-        (new-board-rec 
-            board v count pos
+        (if (any
+                (> 0 pos)
+                (> pos 8)
+            )
+            (x "position invalid")
+            (new-board-rec 
+                board v 0 pos
+            )
         )
     )
 
