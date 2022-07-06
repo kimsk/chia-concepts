@@ -70,3 +70,10 @@ def get_board_from_curried_tic_tac_toe_puzzle(curried_tic_tac_toe_puzzle):
         map(lambda b: int.from_bytes(b, "little"), board_from_puzzle)
     )
     return board_from_puzzle
+
+def get_board_from_curried_tic_tac_toe_coin_puzzle(curried_tic_tac_toe_coin_puzzle):
+    board_from_puzzle = curried_tic_tac_toe_coin_puzzle.at("rrfrrfrrfrrfrrfrfrrrfrfr").as_atom_list()
+    board_from_puzzle = list(
+        map(lambda b: int.from_bytes(b, "little"), board_from_puzzle)
+    )
+    return board_from_puzzle
