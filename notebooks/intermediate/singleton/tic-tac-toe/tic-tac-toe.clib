@@ -5,7 +5,7 @@
     ;     6 7 8
     ; )
 
-    (defun new-board-rec (board v count pos)
+    (defun get-new-board-rec (board v count pos)
         (if (l board)
             (c
                 (if (= count pos) 
@@ -15,7 +15,7 @@
                     )
                     (f board)
                 ) 
-                (new-board-rec 
+                (get-new-board-rec 
                     (r board) v (+ count 1) pos
                 )
             )
@@ -23,14 +23,14 @@
         )
     )
 
-    (defun new-board (board v pos)
+    (defun get-new-board (board v pos)
         (if (any
                 ; valid position is 0-8
                 (> 0 pos)
                 (> pos 8)
             )
             (x "position invalid")
-            (new-board-rec 
+            (get-new-board-rec 
                 board v 0 pos
             )
         )
