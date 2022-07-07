@@ -1,5 +1,6 @@
 from pathlib import Path
 from chia.types.blockchain_format.program import Program
+from chia.wallet.puzzles import singleton_top_layer
 from clvm.casts import int_to_bytes
 
 #  x | o |   
@@ -63,6 +64,9 @@ def get_curried_tic_tac_toe_puzzles(
     )
     return curried_tic_tac_toe_puzzle, curried_tic_tac_toe_coin_puzzle
 
+def get_curried_tic_tac_toe_puzzle_from_curried_coin_puzzle(curried_tic_tac_toe_coin_puzzle):
+    return curried_tic_tac_toe_coin_puzzle.at("rrfrrfrrfrrfrfr")
+
 def get_board_from_curried_tic_tac_toe_puzzle(curried_tic_tac_toe_puzzle):
     board_from_puzzle = curried_tic_tac_toe_puzzle.at("rrfrfr").as_atom_list()
     board_from_puzzle = list(
@@ -70,9 +74,21 @@ def get_board_from_curried_tic_tac_toe_puzzle(curried_tic_tac_toe_puzzle):
     )
     return board_from_puzzle
 
+def get_player_from_curried_tic_tac_toe_puzzle(curried_tic_tac_toe_puzzle):
+    player = curried_tic_tac_toe_puzzle.at("rrfrrfrfr").as_int()
+    return player
+
 def get_board_from_curried_tic_tac_toe_coin_puzzle(curried_tic_tac_toe_coin_puzzle):
-    board_from_puzzle = curried_tic_tac_toe_coin_puzzle.at("rrfrrfrrfrrfrfrrrfrfr").as_atom_list()
-    board_from_puzzle = list(
-        map(lambda b: int.from_bytes(b, "little"), board_from_puzzle)
-    )
+    curried_tic_tac_toe_puzzle = get_curried_tic_tac_toe_puzzle_from_curried_coin_puzzle(curried_tic_tac_toe_coin_puzzle)
+    board_from_puzzle = get_board_from_curried_tic_tac_toe_puzzle(curried_tic_tac_toe_puzzle)
     return board_from_puzzle
+
+def get_position_from_singleton_solution(singleton_solution):
+    position_from_solution = singleton_solution.at("rrfrf").as_int()
+    return position_from_solution
+
+def get_curried_coin_puzzle_from_singleton_puzzle(singleton_puzzle):
+    adapted_inner_puzzle = singleton_puzzle.at("rrfrrfrfr")
+    # rfr
+    curried_tic_tac_toe_coin_puzzle = singleton_top_layer.remove_singleton_truth_wrapper(adapted_inner_puzzle)
+    return curried_tic_tac_toe_coin_puzzle
