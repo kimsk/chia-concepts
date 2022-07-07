@@ -2,6 +2,21 @@ from pathlib import Path
 from chia.types.blockchain_format.program import Program
 from chia.wallet.puzzles import singleton_top_layer
 from clvm.casts import int_to_bytes
+from clvm_tools.clvmc import compile_clvm_text
+
+def load_program(file_path, search_paths):
+    clsp = Path(file_path).read_text()
+    return Program(
+        compile_clvm_text(clsp, search_paths)
+    )
+
+def load_puzzle():
+    tic_tac_toe_puzzle = load_program('tic-tac-toe.clsp', '.')
+    return tic_tac_toe_puzzle
+
+def load_coin_puzzle():
+    tic_tac_toe_coin_puzzle = load_program('tic-tac-toe-coin.clsp', '.')
+    return tic_tac_toe_coin_puzzle
 
 #  x | o |   
 # ---+---+---
@@ -16,18 +31,18 @@ def print_board(b):
     print('---+---+---')
     print(f' {p(b[6])} | {p(b[7])} | {p(b[8])} ')
 
-def get_curried_tic_tac_toe_puzzle(tic_tac_toe_puzzle, board, player):
-    return tic_tac_toe_puzzle.curry(
+def get_curried_puzzle(puzzle, board, player):
+    return puzzle.curry(
         Program.to(board), 
         int_to_bytes(player)
     )
 
-def get_tic_tac_toe_solution(position):
+def get_solution(position):
     return Program.to([position])
     
-def play(curried_tic_tac_toe_puzzle, position):
-    solution = get_tic_tac_toe_solution(position)
-    run_result = curried_tic_tac_toe_puzzle.run(solution)
+def play(curried_puzzle, position):
+    solution = get_solution(position)
+    run_result = curried_puzzle.run(solution)
     return get_play_result(run_result)
 
 # board_state
@@ -44,43 +59,43 @@ def get_play_result(run_result):
     return (board_state, result_board)
 
 
-def get_curried_tic_tac_toe_puzzles(
-    tic_tac_toe_coin_puzzle,
+def get_curried_puzzles(
+    coin_puzzle,
     player_one_hash,
     player_two_hash,
-    tic_tac_toe_puzzle,
+    puzzle,
     board, 
     player):
-    curried_tic_tac_toe_puzzle = get_curried_tic_tac_toe_puzzle(
-        tic_tac_toe_puzzle, 
+    curried_puzzle = get_curried_puzzle(
+        puzzle, 
         board, 
         player
     )
-    curried_tic_tac_toe_coin_puzzle = tic_tac_toe_coin_puzzle.curry(
-        tic_tac_toe_coin_puzzle,
+    curried_coin_puzzle = coin_puzzle.curry(
+        coin_puzzle,
         player_one_hash,
         player_two_hash,
-        curried_tic_tac_toe_puzzle
+        curried_puzzle
     )
-    return curried_tic_tac_toe_puzzle, curried_tic_tac_toe_coin_puzzle
+    return curried_puzzle, curried_coin_puzzle
 
-def get_curried_tic_tac_toe_puzzle_from_curried_coin_puzzle(curried_tic_tac_toe_coin_puzzle):
-    return curried_tic_tac_toe_coin_puzzle.at("rrfrrfrrfrrfrfr")
+def get_curried_puzzle_from_curried_coin_puzzle(curried_coin_puzzle):
+    return curried_coin_puzzle.at("rrfrrfrrfrrfrfr")
 
-def get_board_from_curried_tic_tac_toe_puzzle(curried_tic_tac_toe_puzzle):
-    board_from_puzzle = curried_tic_tac_toe_puzzle.at("rrfrfr").as_atom_list()
+def get_board_from_curried_puzzle(curried_puzzle):
+    board_from_puzzle = curried_puzzle.at("rrfrfr").as_atom_list()
     board_from_puzzle = list(
         map(lambda b: int.from_bytes(b, "little"), board_from_puzzle)
     )
     return board_from_puzzle
 
-def get_player_from_curried_tic_tac_toe_puzzle(curried_tic_tac_toe_puzzle):
-    player = curried_tic_tac_toe_puzzle.at("rrfrrfrfr").as_int()
+def get_player_from_curried_puzzle(curried_puzzle):
+    player = curried_puzzle.at("rrfrrfrfr").as_int()
     return player
 
-def get_board_from_curried_tic_tac_toe_coin_puzzle(curried_tic_tac_toe_coin_puzzle):
-    curried_tic_tac_toe_puzzle = get_curried_tic_tac_toe_puzzle_from_curried_coin_puzzle(curried_tic_tac_toe_coin_puzzle)
-    board_from_puzzle = get_board_from_curried_tic_tac_toe_puzzle(curried_tic_tac_toe_puzzle)
+def get_board_from_curried_coin_puzzle(curried_coin_puzzle):
+    curried_puzzle = get_curried_puzzle_from_curried_coin_puzzle(curried_coin_puzzle)
+    board_from_puzzle = get_board_from_curried_puzzle(curried_puzzle)
     return board_from_puzzle
 
 def get_position_from_singleton_solution(singleton_solution):
@@ -90,5 +105,5 @@ def get_position_from_singleton_solution(singleton_solution):
 def get_curried_coin_puzzle_from_singleton_puzzle(singleton_puzzle):
     adapted_inner_puzzle = singleton_puzzle.at("rrfrrfrfr")
     # rfr
-    curried_tic_tac_toe_coin_puzzle = singleton_top_layer.remove_singleton_truth_wrapper(adapted_inner_puzzle)
-    return curried_tic_tac_toe_coin_puzzle
+    curried_coin_puzzle = singleton_top_layer.remove_singleton_truth_wrapper(adapted_inner_puzzle)
+    return curried_coin_puzzle
