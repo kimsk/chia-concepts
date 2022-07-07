@@ -88,14 +88,18 @@
 
     )
 
-    (defun-inline get-player-from-curried-tic-tac-toe-puzzle (puzzle)
-        (r (f (r (f (r (r (f (r (r puzzle)))))))))
+    (defun-inline get-player-from-curried-tic-tac-toe-puzzle (curried_puzzle)
+        (r (f (r (f (r (r (f (r (r curried_puzzle)))))))))
     )
 
-    (defun-inline get-next-player-from-curried-tic-tac-toe-puzzle (puzzle)
-        (if (= (get-player-from-curried-tic-tac-toe-puzzle puzzle) 1)
+    (defun-inline get-next-player-from-curried-tic-tac-toe-puzzle (curried_puzzle)
+        (if (= (get-player-from-curried-tic-tac-toe-puzzle curried_puzzle) 1)
             2
             1
         )
+    )
+
+    (defun-inline get-uncurried-tic-tac-toe-puzzle (curried_puzzle)
+        (r (f (r curried_puzzle)))
     )
 )

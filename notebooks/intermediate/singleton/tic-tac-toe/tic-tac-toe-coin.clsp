@@ -1,4 +1,4 @@
-(mod (MOD PLAYER_ONE_HASH PLAYER_TWO_HASH TIC_TAC_TOE_PUZZLE CURRIED_TIC_TAC_TOE_PUZZLE odd_amount position)
+(mod (MOD PLAYER_ONE_HASH PLAYER_TWO_HASH CURRIED_TIC_TAC_TOE_PUZZLE odd_amount position)
     (include condition_codes.clib)
     (include tic-tac-toe.clib)
     (include utils.clib)
@@ -10,7 +10,7 @@
         )
     )
 
-    (defun main (MOD PLAYER_ONE_HASH PLAYER_TWO_HASH TIC_TAC_TOE_PUZZLE odd_amount next_player (play_result next_board))
+    (defun main (MOD PLAYER_ONE_HASH PLAYER_TWO_HASH tic_tac_toe_puzzle (play_result next_board) odd_amount next_player)
         (if (not (= 0 play_result))
             (c
                 (list CREATE_COIN 0x900ddeed -113)
@@ -33,9 +33,8 @@
                             MOD
                             PLAYER_ONE_HASH
                             PLAYER_TWO_HASH
-                            TIC_TAC_TOE_PUZZLE
                             (curry
-                                TIC_TAC_TOE_PUZZLE 
+                                tic_tac_toe_puzzle 
                                 (list 
                                     next_board
                                     next_player
@@ -52,10 +51,10 @@
     (main
         MOD
         PLAYER_ONE_HASH
-        PLAYER_TWO_HASH 
-        TIC_TAC_TOE_PUZZLE
+        PLAYER_TWO_HASH
+        (get-uncurried-tic-tac-toe-puzzle CURRIED_TIC_TAC_TOE_PUZZLE) ; uncurry to get original tic_tac_toe_puzzle
+        (a CURRIED_TIC_TAC_TOE_PUZZLE (list position)) ; get board result
         odd_amount
-        (get-next-player-from-curried-tic-tac-toe-puzzle CURRIED_TIC_TAC_TOE_PUZZLE)
-        (a CURRIED_TIC_TAC_TOE_PUZZLE (list position))
+        (get-next-player-from-curried-tic-tac-toe-puzzle CURRIED_TIC_TAC_TOE_PUZZLE) ; get next player
     )
 )
