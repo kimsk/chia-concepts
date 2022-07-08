@@ -11,7 +11,7 @@
                 (if (= count pos) 
                     (if (= 0 (f board))
                         v
-                        (x "position already occupied")
+                        (x pos "position already occupied")
                     )
                     (f board)
                 ) 
@@ -29,7 +29,7 @@
                 (> 0 pos)
                 (> pos 8)
             )
-            (x "position invalid")
+            (x pos "position invalid")
             (get-new-board-rec 
                 board v 0 pos
             )

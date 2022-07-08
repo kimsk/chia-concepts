@@ -1,8 +1,11 @@
 from pathlib import Path
 from chia.types.blockchain_format.program import Program
-from chia.wallet.puzzles import singleton_top_layer
 from clvm.casts import int_to_bytes
 from clvm_tools.clvmc import compile_clvm_text
+
+import sys
+sys.path.insert(0, "..")
+import singleton_helpers_v1_1
 
 def load_program(file_path, search_paths):
     clsp = Path(file_path).read_text()
@@ -98,12 +101,31 @@ def get_board_from_curried_coin_puzzle(curried_coin_puzzle):
     board_from_puzzle = get_board_from_curried_puzzle(curried_puzzle)
     return board_from_puzzle
 
+def get_player_from_curried_coin_puzzle(curried_coin_puzzle):
+    curried_puzzle = get_curried_puzzle_from_curried_coin_puzzle(curried_coin_puzzle)
+    player_from_puzzle = get_player_from_curried_puzzle(curried_puzzle)
+    return player_from_puzzle
+
 def get_position_from_singleton_solution(singleton_solution):
     position_from_solution = singleton_solution.at("rrfrf").as_int()
     return position_from_solution
 
 def get_curried_coin_puzzle_from_singleton_puzzle(singleton_puzzle):
-    adapted_inner_puzzle = singleton_puzzle.at("rrfrrfrfr")
-    # rfr
-    curried_coin_puzzle = singleton_top_layer.remove_singleton_truth_wrapper(adapted_inner_puzzle)
+    curried_coin_puzzle = singleton_puzzle.at("rrfrrfrfr")
     return curried_coin_puzzle
+
+async def get_current_state(get_coin_records_by_parent_ids, get_coin_record_by_name, get_puzzle_and_solution, launcher_id):
+    singleton_coin = await singleton_helpers_v1_1.get_unspent_singleton(get_coin_records_by_parent_ids, launcher_id)
+    parent_id = singleton_coin.parent_coin_info
+    parent_coin_record = await get_coin_record_by_name(parent_id)
+    spent_block_index = parent_coin_record.spent_block_index
+    coin_spent = await get_puzzle_and_solution(parent_id, spent_block_index)
+
+    singleton_puzzle = coin_spent.puzzle_reveal.to_program()
+    singleton_solution = coin_spent.solution.to_program()
+
+    curried_coin_puzzle = get_curried_coin_puzzle_from_singleton_puzzle(singleton_puzzle)
+    curried_puzzle = get_curried_puzzle_from_curried_coin_puzzle(curried_coin_puzzle)
+    position_from_solution = get_position_from_singleton_solution(singleton_solution)
+    result, current_board = play(curried_puzzle, position_from_solution)
+    return result, current_board
