@@ -13,9 +13,12 @@
     (defun main (MOD PLAYER_ONE_HASH PLAYER_TWO_HASH tic_tac_toe_puzzle (play_result next_board) odd_amount next_player)
         (if (not (= 0 play_result))
             (c
-                (list CREATE_COIN 0x900ddeed -113)
+                (list CREATE_COIN PLAYER_ONE_HASH -113)
                 (if (= -1 play_result)
-                    ()
+                    (list
+                        (list CREATE_COIN PLAYER_ONE_HASH (/ odd_amount 2))
+                        (list CREATE_COIN PLAYER_TWO_HASH (/ odd_amount 2))
+                    )
                     (list
                         (if (= 1 play_result)
                             (list CREATE_COIN PLAYER_ONE_HASH odd_amount)

@@ -115,11 +115,23 @@ def get_curried_coin_puzzle_from_singleton_puzzle(singleton_puzzle):
     return curried_coin_puzzle
 
 async def get_current_state(get_coin_records_by_parent_ids, get_coin_record_by_name, get_puzzle_and_solution, launcher_id):
-    singleton_coin = await singleton_helpers_v1_1.get_unspent_singleton(get_coin_records_by_parent_ids, launcher_id)
-    parent_id = singleton_coin.parent_coin_info
-    parent_coin_record = await get_coin_record_by_name(parent_id)
-    spent_block_index = parent_coin_record.spent_block_index
-    coin_spent = await get_puzzle_and_solution(parent_id, spent_block_index)
+    singleton_coin_record = await singleton_helpers_v1_1.get_last_singleton_coin_record(get_coin_records_by_parent_ids, launcher_id)
+    if singleton_coin_record == None:
+        return None
+    # print(f'last: {singleton_coin_record}')
+
+    if singleton_coin_record.spent_block_index == 0:
+        # unspent coin, get the parent coin puzzle and solution
+        singleton_coin = singleton_coin_record.coin
+        parent_id = singleton_coin.parent_coin_info
+        parent_coin_record = await get_coin_record_by_name(parent_id)
+        coin_id = parent_id
+        spent_block_index = parent_coin_record.spent_block_index
+    else:
+        coin_id = singleton_coin_record.coin.name()
+        spent_block_index = singleton_coin_record.spent_block_index
+    
+    coin_spent = await get_puzzle_and_solution(coin_id, spent_block_index)
 
     singleton_puzzle = coin_spent.puzzle_reveal.to_program()
     singleton_solution = coin_spent.solution.to_program()
