@@ -1,0 +1,26 @@
+(mod (MOD MAX_VALUE TERMINAL_PUZZLE AMOUNT VALUE)
+    (include condition_codes.clib)
+    (include utils.clib)
+
+    (defun create-next-counter (MOD MAX_VALUE TERMINAL_PUZZLE AMOUNT VALUE)
+        (list
+            (list CREATE_COIN 
+                (sha256tree
+                        (curry
+                            MOD
+                            (list
+                                MOD MAX_VALUE TERMINAL_PUZZLE AMOUNT
+                                (+ VALUE 1)
+                            )
+                        )
+                )
+                AMOUNT
+            )
+        )
+    )
+
+    (if (= MAX_VALUE VALUE)
+        (a TERMINAL_PUZZLE ()) ; Terminated
+        (create-next-counter MOD MAX_VALUE TERMINAL_PUZZLE AMOUNT VALUE)
+    )
+)    

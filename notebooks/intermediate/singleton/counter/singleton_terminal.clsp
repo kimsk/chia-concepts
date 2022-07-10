@@ -1,0 +1,11 @@
+(mod (PUZZLE_HASH AMOUNT)
+    (include condition_codes.clib)
+
+    (list
+        (list CREATE_COIN PUZZLE_HASH -113) ; terminate singleton
+        (if (logand AMOUNT 1) ; create even amount
+            (list CREATE_COIN PUZZLE_HASH (- AMOUNT 1)) 
+            (list CREATE_COIN PUZZLE_HASH AMOUNT)
+        )
+    )
+)
