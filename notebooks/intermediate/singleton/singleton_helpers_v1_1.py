@@ -29,19 +29,26 @@ async def get_launcher_coin_by_comment(get_block_records, get_additions_and_remo
                 return cr.coin
     return None
 
-async def get_unspent_singleton(get_coin_records_by_parent_ids, launcher_id):
+async def get_last_singleton_coin_record(get_coin_records_by_parent_ids, launcher_id):
     parent_coin_id = launcher_id
+    last_singleton_coin_record = None
     while parent_coin_id != None:
-        coin_records: List[CoinRecord] = await get_coin_records_by_parent_ids([parent_coin_id], include_spent_coins = True) 
-        singleton: CoinRecord = next(cr for cr in coin_records if cr.coin.amount%2 != 0)
-
-        if singleton != None:
-            if singleton.spent_block_index == 0:
-                return singleton.coin
-            parent_coin_id = singleton.coin.name()
-        else:
+        coin_records = await get_coin_records_by_parent_ids([parent_coin_id], include_spent_coins = True)
+        if len(coin_records) == 0:
             parent_coin_id = None
+        else:
+            singleton_coin_record = next(cr for cr in coin_records if cr.coin.amount%2 != 0)
+            if singleton_coin_record != None:
+                last_singleton_coin_record = singleton_coin_record
+                parent_coin_id = last_singleton_coin_record.coin.name()
 
+    return last_singleton_coin_record
+
+async def get_unspent_singleton(get_coin_records_by_parent_ids, launcher_id):
+    last_singleton_coin_record = await get_last_singleton_coin_record(get_coin_records_by_parent_ids, launcher_id)
+    if last_singleton_coin_record == None or last_singleton_coin_record.spent_block_index != 0:
+        return None
+    return last_singleton_coin_record.coin
 
 def get_singleton_coin_spend(singleton_coin, singleton_puzzle, lineage_proof, inner_solution):
     singleton_solution = singleton_top_layer_v1_1.solution_for_singleton(
