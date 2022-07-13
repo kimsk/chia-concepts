@@ -38,7 +38,7 @@ async def get_last_singleton_coin_record(get_coin_records_by_parent_ids, launche
             parent_coin_id = None
         else:
             singleton_coin_record = next((cr for cr in coin_records if cr.coin.amount%2 != 0), None)
-            if singleton_coin_record != None:
+            if singleton_coin_record != None and singleton_coin_record.coin.puzzle_hash != singleton_top_layer_v1_1.SINGLETON_LAUNCHER_HASH:
                 last_singleton_coin_record = singleton_coin_record
                 parent_coin_id = last_singleton_coin_record.coin.name()
             else:
