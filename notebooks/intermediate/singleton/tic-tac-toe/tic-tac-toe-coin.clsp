@@ -16,13 +16,13 @@
                 (list CREATE_COIN PLAYER_ONE_HASH -113)
                 (if (= -1 play_result)
                     (list
-                        (list CREATE_COIN PLAYER_ONE_HASH (/ odd_amount 2))
-                        (list CREATE_COIN PLAYER_TWO_HASH (/ odd_amount 2))
+                        (list CREATE_COIN PLAYER_ONE_HASH 20)
+                        (list CREATE_COIN PLAYER_TWO_HASH 20)
                     )
                     (list
                         (if (= 1 play_result)
-                            (list CREATE_COIN PLAYER_ONE_HASH odd_amount)
-                            (list CREATE_COIN PLAYER_TWO_HASH odd_amount)
+                            (list CREATE_COIN PLAYER_ONE_HASH (- odd_amount 1))
+                            (list CREATE_COIN PLAYER_TWO_HASH (- odd_amount 1))
                         )
                     )
                 )
