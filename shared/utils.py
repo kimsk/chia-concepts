@@ -22,5 +22,16 @@ def print_puzzle(puzzle, tail=0):
     else:
         print(f'...{p[(tail * -1):]}')
 
+def print_push_tx_result(result):
+    print("additions:")
+    print("==========")
+    for addition in result["additions"]:
+        print(addition)
+        
+    print("removals:")
+    print("=========")
+    for removal in result["removals"]:
+        print(removal)
+
 def print_json(dict):
     print(json.dumps(dict, sort_keys=True, indent=4))
