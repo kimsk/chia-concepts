@@ -1,0 +1,20 @@
+(
+    (defun sha256tree (TREE)
+        (if (l TREE)
+            (sha256 2 (sha256tree (f TREE)) (sha256tree (r TREE)))
+            (sha256 1 TREE)
+        )
+    )
+
+    ;;https://chialisp.com/docs/common_functions#currying
+    (defun fix_curry_args (items core)
+        (if items
+            (qq (c (q . (unquote (f items))) (unquote (fix_curry_args (r items) core))))
+            core
+        )
+    )
+
+    (defun curry (func list_of_args) 
+        (qq (a (q . (unquote func)) (unquote (fix_curry_args list_of_args (q . 1)))))
+    )
+)

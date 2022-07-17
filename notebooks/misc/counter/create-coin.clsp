@@ -1,0 +1,7 @@
+(mod (PUZZLE_HASH AMOUNT)
+    (include condition_codes.clib)
+
+    (list
+        (list CREATE_COIN PUZZLE_HASH AMOUNT)
+    )
+)
