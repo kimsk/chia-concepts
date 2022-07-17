@@ -28,9 +28,11 @@ pip install jupyterlab_sos
 ## Notebooks
 - [Example](./notebooks/example.ipynb)
 
-### CLVM
-- [Dive into CLVM](notebooks/clvm/dive-into-CLVM.ipynb)
-
+### Misc 
+- [Dive into CLVM](notebooks/misc/dive-into-CLVM.ipynb)
+- [Automatic Counter](notebooks/misc/counter/notebook.ipynb)
+    - [Normal Coin](notebooks/misc/counter/create-coin.ipynb)
+    - [Singleton Counter](notebooks/misc/counter/singleton-counter.ipynb)
 
 ### Basic
 - [BLS]
@@ -41,7 +43,7 @@ pip install jupyterlab_sos
 ### Intermediate
 - [DIDs]
 - [Singleton](notebooks/intermediate/singleton/notebook.ipynb)
-    - [Singleton Counter](notebooks/intermediate/singleton/singleton_counter.ipynb)
+    - [Singleton Counter (old)](notebooks/intermediate/singleton/singleton_counter.ipynb)
 - [Standard Transaction](notebooks/intermediate/standard-transaction/notebook.ipynb)
 - [Pooling]
 
