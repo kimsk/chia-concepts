@@ -30,7 +30,7 @@ pip install jupyterlab_sos
 
 ### Misc 
 - [Dive into CLVM](notebooks/misc/dive-into-CLVM.ipynb)
-- [Automatic Counter](notebooks/misc/counter/notebook.ipynb)
+- [Automatic Counter](notebooks/misc/counter/README.md)
     - [Normal Coin](notebooks/misc/counter/create-coin.ipynb)
     - [Singleton Counter](notebooks/misc/counter/singleton-counter.ipynb)
 
