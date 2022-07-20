@@ -1,7 +1,8 @@
 # Counter
 
-In this notebook, we create several puzzles to implement counter (0 to `MAX_COUNT`).
+In this example, we show how implement a counter (0 to `MAX_COUNT`) coin to store a current count on Chia Blockchain.
 
+## Chia Concepts and Design Patterns
 This exmple demostrates several Chia concepts and design patterns:
 1. [Outer and Inner puzzles](https://chialisp.com/docs/common_functions#outer-and-inner-puzzles)
 2. [Currying](https://chialisp.com/docs/common_functions#currying)
@@ -12,7 +13,7 @@ This exmple demostrates several Chia concepts and design patterns:
 4. [Storing State](https://developers.chia.net/t/can-you-store-state-on-the-network/84)
     - Deriving current state from previous coin spend
 
-### Counter Puzzle
+## Counter Puzzle
 #### [counter.clsp](counter.clsp)
 
 This is the main puzzle storing the current count. When a coin with this puzzle is spent, a new coin with `count + 1` is created. A `TERMINAL_PUZZLE` can be provided to customize the output of the last coin (when `COUNT` is equal to the `MAX_COUNT`).  
@@ -52,7 +53,7 @@ This is the main puzzle storing the current count. When a coin with this puzzle 
 )    
 ```
 
-### Terminal Puzzle
+## Terminal Puzzle
 
 The terminal puzzles are inner puzzles providing the terminal conditions for the counter puzzle. The `create-coin` puzzle will just create a new coin while the `terminate-singleton` puzzle will also provide `-113` which is a terminate signal for the standard [singleton top layer puzzle](https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/singleton_top_layer_v1_1.clvm). 
 
