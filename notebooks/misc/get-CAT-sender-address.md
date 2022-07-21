@@ -164,7 +164,7 @@ TCHM:
 ❯ chia wallet send -f $sender -t txch1q5wecs3d8e5le63mcjvzkdg4rnd7wlxqj45ne9sr6rgswppzk0vquv4h0p -i 2 -a 1 -m 0.0005
 ```
 
-## Get TCHM Sender Address
+## Get TCHM Parent Coin
 ```sh
 ❯ chia wallet show -f $receiver
 Wallet height: 1278450
@@ -224,11 +224,36 @@ TCHM:
         "timestamp": 1658326642
     }
 }
-
-# verify TCHM puzzle hash
-❯ $parent_puzzle_hash = 'ba0ea3ce91e842a8fbbd99ecc196b77599e7f6d1ce528e8252bd6154e9cfd91a'
-❯ cdv clsp cat_puzzle_hash --tail $tchm_asset_id $parent_puzzle_hash
-3fefc5e71356f1c78e037d742af3820123d532815bcd2e04a42745dcd939a0a1
 ```
 
-`TCHM` puzzle hash, `3fefc5e71356f1c78e037d742af3820123d532815bcd2e04a42745dcd939a0a1`, is matched with `cdv clsp cat_puzzle_hash` result, `3fefc5e71356f1c78e037d742af3820123d532815bcd2e04a42745dcd939a0a1`
+## Get XCH address from TCHM Parent CoinSpend's Solution
+
+```sh
+❯ $tchm_parent_coin_info = '0x161243d38e520eeb986d365c316dd20a8dbdc326015883deac2eafd3b2db6fee'
+❯ $tchm_parent_spent_block_idx = 1278443
+❯ $payload = @{ coin_id = $tchm_parent_coin_info; height = $tchm_parent_spent_block_idx } | ConvertTo-Json
+
+~
+❯ chia rpc full_node get_puzzle_and_solution $($payload -replace '"', '\"')
+{
+    "coin_solution": {
+        "coin": {
+            "amount": 5000,
+            "parent_coin_info": "0x024c7688afdf0689ed32aa14d4dd5f84646a5c4085fc7576e8c9d60a00ece8b8",
+            "puzzle_hash": "0x3fefc5e71356f1c78e037d742af3820123d532815bcd2e04a42745dcd939a0a1"
+        },
+        "puzzle_reveal": "0xff02f...80808080",
+        "solution": "0xffff80ffff01ffff33ffa0051d9c422d3e69fcea3bc4982b35151cdbe77cc095693c9603d0d1070422b3d8ff8203e8ffffa0051d9c422d3e69fcea3bc4982b35151cdbe77cc095693c9603d0d1070422b3d88080ffff33ffa0a9bcff9a8db5f62b6d1713b8517274a09d320dc4a521189836ae44501a1eadaeff820fa080ffff3cffa080d41b950a2575f13f0133bc149fcbb4863c03d668c97371a84962bd9a3695a58080ff8080ffffa087e292e32b470f355ed72db3a621904bc74fc2b988ae2cfd56af2c050361b176ffa0d744efc17b775e4a41fa3477b5a2e7cee94819cdcd17d12d39150fc1c8d49b5eff830186a080ffa0161243d38e520eeb986d365c316dd20a8dbdc326015883deac2eafd3b2db6feeffffa0024c7688afdf0689ed32aa14d4dd5f84646a5c4085fc7576e8c9d60a00ece8b8ffa03fefc5e71356f1c78e037d742af3820123d532815bcd2e04a42745dcd939a0a1ff82138880ffffa0024c7688afdf0689ed32aa14d4dd5f84646a5c4085fc7576e8c9d60a00ece8b8ffa0ba0ea3ce91e842a8fbbd99ecc196b77599e7f6d1ce528e8252bd6154e9cfd91aff82138880ff80ff8080"
+    },
+    "success": true
+}
+
+# decode solution
+❯ opd ffff80ffff01ffff33ffa0051d9c422d3e69fcea3bc4982b35151cdbe77cc095693c9603d0d1070422b3d8ff8203e8ffffa0051d9c422d3e69fcea3bc4982b35151cdbe77cc095693c9603d0d1070422b3d88080ffff33ffa0a9bcff9a8db5f62b6d1713b8517274a09d320dc4a521189836ae44501a1eadaeff820fa080ffff3cffa080d41b950a2575f13f0133bc149fcbb4863c03d668c97371a84962bd9a3695a58080ff8080ffffa087e292e32b470f355ed72db3a621904bc74fc2b988ae2cfd56af2c050361b176ffa0d744efc17b775e4a41fa3477b5a2e7cee94819cdcd17d12d39150fc1c8d49b5eff830186a080ffa0161243d38e520eeb986d365c316dd20a8dbdc326015883deac2eafd3b2db6feeffffa0024c7688afdf0689ed32aa14d4dd5f84646a5c4085fc7576e8c9d60a00ece8b8ffa03fefc5e71356f1c78e037d742af3820123d532815bcd2e04a42745dcd939a0a1ff82138880ffffa0024c7688afdf0689ed32aa14d4dd5f84646a5c4085fc7576e8c9d60a00ece8b8ffa0ba0ea3ce91e842a8fbbd99ecc196b77599e7f6d1ce528e8252bd6154e9cfd91aff82138880ff80ff8080
+(... (0x024c7688afdf0689ed32aa14d4dd5f84646a5c4085fc7576e8c9d60a00ece8b8 0xba0ea3ce91e842a8fbbd99ecc196b77599e7f6d1ce528e8252bd6154e9cfd91a 5000) () ())
+
+❯ cdv encode ba0ea3ce91e842a8fbbd99ecc196b77599e7f6d1ce528e8252bd6154e9cfd91a --prefix txch
+txch1hg828n53app237aan8kvr94hwkv70ak3eefgaqjjh4s4f6w0mydqdutqkw
+```
+
+`0xba0ea3ce91e842a8fbbd99ecc196b77599e7f6d1ce528e8252bd6154e9cfd91a` is the puzzle hash of the sender and `txch1hg828n53app237aan8kvr94hwkv70ak3eefgaqjjh4s4f6w0mydqdutqkw` is the address to which we can send anything (e.g., TCHM or NFT).
