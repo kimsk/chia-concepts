@@ -186,11 +186,20 @@ TCHM:
    -Asset ID:              af4a9c1a4bdc6fd9b38c406be37ef4ba642036679c220767929c0e0ee6466144
    -Wallet ID:             2
 ```
+# verify TCHM puzzle hash
+❯ $parent_puzzle_hash = 'ba0ea3ce91e842a8fbbd99ecc196b77599e7f6d1ce528e8252bd6154e9cfd91a'
+❯ cdv clsp cat_puzzle_hash --tail $tchm_asset_id $parent_puzzle_hash
+3fefc5e71356f1c78e037d742af3820123d532815bcd2e04a42745dcd939a0a1
+```
 
+`TCHM` puzzle hash, `3fefc5e71356f1c78e037d742af3820123d532815bcd2e04a42745dcd939a0a1`, is matched with `cdv clsp cat_puzzle_hash` result, `3fefc5e71356f1c78e037d742af3820123d532815bcd2e04a42745dcd939a0a1`
 
 ```sh
-❯ $receiver_tchm_puzzle_hash = 'cb0306f5ef3bdda660bcb38c7c27628b3a104a14e25baa9a23be53d4ff122306'
+> $receiver_puzzle_hash = cdv decode txch1q5wecs3d8e5le63mcjvzkdg4rnd7wlxqj45ne9sr6rgswppzk0vquv4h0p
 ❯ $tchm_asset_id = 'af4a9c1a4bdc6fd9b38c406be37ef4ba642036679c220767929c0e0ee6466144'
+❯ cdv clsp cat_puzzle_hash --tail $tchm_asset_id $receiver_puzzle_hash
+cb0306f5ef3bdda660bcb38c7c27628b3a104a14e25baa9a23be53d4ff122306
+❯ $receiver_tchm_puzzle_hash = 'cb0306f5ef3bdda660bcb38c7c27628b3a104a14e25baa9a23be53d4ff122306'
 
 # Get THCM
 ❯ cdv rpc coinrecords --by puzzlehash $receiver_tchm_puzzle_hash
