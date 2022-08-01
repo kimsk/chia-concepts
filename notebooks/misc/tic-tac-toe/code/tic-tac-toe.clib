@@ -1,0 +1,121 @@
+(   
+    (defconstant EMPTY ' ')
+    (defconstant MIN_POS 0)
+    (defconstant MAX_POS 8)
+    ;  o | o | x 
+    ; ---+---+---
+    ;  x | x | x 
+    ; ---+---+---
+    ;  o | x | o 
+    (defun get-new-board-rec (board v count pos)
+        (if (l board)
+            (c
+                (if (= count pos) 
+                    (if (= EMPTY (f board))
+                        v
+                        (x pos "position already occupied")
+                    )
+                    (f board)
+                ) 
+                (get-new-board-rec 
+                    (r board) v (+ count 1) pos
+                )
+            )
+            () 
+        )
+    )
+
+    ; (
+    ;     0 1 2
+    ;     3 4 5
+    ;     6 7 8
+    ; )
+    (defun get-new-board (board v pos)
+        (if (any
+                ; valid position is 0-8
+                (> MIN_POS pos)
+                (> pos MAX_POS)
+            )
+            (x pos "position invalid")
+            (get-new-board-rec 
+                board v 0 pos
+            )
+        )
+    )
+
+    (defun-inline check-line (v0 v1 v2 v)
+        (if
+            (all
+                (= v0 v)
+                (= v1 v)
+                (= v2 v)
+            )
+            1 ; all position matched
+            0
+        )
+    )
+
+    (defun check-playable-board ((p0 p1 p2 p3 p4 p5 p6 p7 p8))
+        (if
+            ; if there is any playable position left
+            (any
+                (= p0 EMPTY)
+                (= p1 EMPTY)
+                (= p2 EMPTY)
+                (= p3 EMPTY)
+                (= p4 EMPTY)
+                (= p5 EMPTY)
+                (= p6 EMPTY)
+                (= p7 EMPTY)
+                (= p8 EMPTY)
+            )
+            0  ; one or more positions left
+            -1 ; unplayable board, tie game
+        )
+    )
+
+    (defun check-winning-board ((p0 p1 p2 p3 p4 p5 p6 p7 p8) v)
+        (if 
+            (any
+                ; horizontal
+                (check-line p0 p1 p2 v)
+                (check-line p3 p4 p5 v)
+                (check-line p6 p7 p8 v)
+                ; vertical
+                (check-line p0 p3 p6 v)
+                (check-line p1 p4 p7 v)
+                (check-line p2 p5 p8 v)
+                ; diaganol
+                (check-line p0 p4 p8 v)
+                (check-line p2 p4 p6 v)
+            )
+            1 ; v won
+            0
+        )
+    )
+
+    ;   if v won return v
+    ;   else if board is still playable return 0 (playable)
+    ;   else return -1 (not playable)
+    (defun check-board (board v)
+        (if (= (check-winning-board board v) 1)
+            v ; v won
+            (check-playable-board board) ; 0 or -1
+        )
+    )
+
+    (defun-inline get-player-from-curried-tic-tac-toe-puzzle (curried_puzzle)
+        (r (f (r (f (r (r (f (r (r curried_puzzle)))))))))
+    )
+
+    (defun-inline get-next-player-from-curried-tic-tac-toe-puzzle (curried_puzzle)
+        (if (= (get-player-from-curried-tic-tac-toe-puzzle curried_puzzle) 1)
+            2
+            1
+        )
+    )
+
+    (defun-inline get-uncurried-tic-tac-toe-puzzle (curried_puzzle)
+        (r (f (r curried_puzzle)))
+    )
+)

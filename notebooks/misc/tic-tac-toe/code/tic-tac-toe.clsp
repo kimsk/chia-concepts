@@ -1,0 +1,17 @@
+;   BOARD : current tic tac toe board state (curried)
+;   V     : x or o to be played (curried)
+;   pos   : position to be played
+(mod (BOARD V pos)
+    (include tic-tac-toe.clib)
+
+    (defun play (new_board V)
+        (list 
+            (check-board new_board V)
+            new_board
+        )
+    )
+
+    ; 1. get new board
+    ; 2. return the play result and new board
+    (play (get-new-board BOARD V pos) V)
+)
