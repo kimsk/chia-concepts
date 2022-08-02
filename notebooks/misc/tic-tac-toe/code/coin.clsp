@@ -23,8 +23,8 @@
                 (list CREATE_COIN PLAYER_ONE_HASH -113) ; destroy a singleton coin
                 (if (= -1 play_result) ; tie game
                     (list
-                        (list CREATE_COIN PLAYER_ONE_HASH 20)
-                        (list CREATE_COIN PLAYER_TWO_HASH 20)
+                        (list CREATE_COIN PLAYER_ONE_HASH (/ (- amount 2) 2))
+                        (list CREATE_COIN PLAYER_TWO_HASH (/ (- amount 2) 2))
                     )
                     (list
                         (if (= 'x' play_result)

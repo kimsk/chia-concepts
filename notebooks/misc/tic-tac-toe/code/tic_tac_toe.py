@@ -75,4 +75,4 @@ def get_board_from_curried_puzzle(curried_puzzle):
 
 def get_player_from_curried_puzzle(curried_puzzle):
     player = curried_puzzle.at("rrfrrfrfr").as_int()
-    return player
+    return chr(player)
