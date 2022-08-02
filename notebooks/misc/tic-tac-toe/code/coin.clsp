@@ -5,31 +5,30 @@
 ;   AMOUNT                      : coin amount (odd to be used with singleton top layer)
 ;   position                    : next play position as inner solution for curried tic tac toe puzzle
 
-(mod (MOD PLAYER_ONE_INFO PLAYER_TWO_INFO CURRIED_TIC_TAC_TOE_PUZZLE amount position)
+(mod (MOD PLAYER_ONE_INFO PLAYER_TWO_INFO CURRIED_TIC_TAC_TOE_PUZZLE AMOUNT position)
     (include condition_codes.clib)
     (include tic-tac-toe.clib)
     (include utils.clib)
 
-    (defun create-new-coin (puzzle_hash amount)
+    (defun create-new-coin (puzzle_hash AMOUNT)
         (list
-            (list ASSERT_MY_AMOUNT amount)
-            (list CREATE_COIN puzzle_hash amount)
+            (list CREATE_COIN puzzle_hash AMOUNT)
         )
     )
 
-    (defun p2-players (MOD (PLAYER_ONE_PK PLAYER_ONE_HASH) (PLAYER_TWO_PK PLAYER_TWO_HASH) tic_tac_toe_puzzle play_result next_board amount next_player)
+    (defun p2-players (MOD (PLAYER_ONE_PK PLAYER_ONE_HASH) (PLAYER_TWO_PK PLAYER_TWO_HASH) tic_tac_toe_puzzle play_result next_board AMOUNT next_player)
         (if (not (= 0 play_result))
             (c
                 (list CREATE_COIN PLAYER_ONE_HASH -113) ; destroy a singleton coin
                 (if (= -1 play_result) ; tie game
                     (list
-                        (list CREATE_COIN PLAYER_ONE_HASH (/ (- amount 2) 2))
-                        (list CREATE_COIN PLAYER_TWO_HASH (/ (- amount 2) 2))
+                        (list CREATE_COIN PLAYER_ONE_HASH (/ (- AMOUNT 2) 2))
+                        (list CREATE_COIN PLAYER_TWO_HASH (/ (- AMOUNT 2) 2))
                     )
                     (list
                         (if (= 'x' play_result)
-                            (list CREATE_COIN PLAYER_ONE_HASH (- amount 1))
-                            (list CREATE_COIN PLAYER_TWO_HASH (- amount 1))
+                            (list CREATE_COIN PLAYER_ONE_HASH (- AMOUNT 1))
+                            (list CREATE_COIN PLAYER_TWO_HASH (- AMOUNT 1))
                         )
                     )
                 )
@@ -50,18 +49,19 @@
                                     next_player
                                 )
                             )
+                            AMOUNT
                         )
                     )
                 )
-                amount
+                AMOUNT
             )
         )
     )
 
-    (defun main (MOD (PLAYER_ONE_PK PLAYER_ONE_HASH) (PLAYER_TWO_PK PLAYER_TWO_HASH) tic_tac_toe_puzzle (play_result next_board) amount next_player)
+    (defun main (MOD (PLAYER_ONE_PK PLAYER_ONE_HASH) (PLAYER_TWO_PK PLAYER_TWO_HASH) tic_tac_toe_puzzle (play_result next_board) AMOUNT next_player position)
         (c 
-            (list AGG_SIG_ME (if (= 'x' next_player) PLAYER_ONE_PK PLAYER_TWO_PK) (sha256tree next_board))
-            (p2-players MOD (list PLAYER_ONE_PK PLAYER_ONE_HASH) (list PLAYER_TWO_PK PLAYER_TWO_HASH) tic_tac_toe_puzzle play_result next_board amount next_player)
+            (list AGG_SIG_ME (if (= 'x' next_player) PLAYER_TWO_PK PLAYER_ONE_PK) (sha256 position))
+            (p2-players MOD (list PLAYER_ONE_PK PLAYER_ONE_HASH) (list PLAYER_TWO_PK PLAYER_TWO_HASH) tic_tac_toe_puzzle play_result next_board AMOUNT next_player)
         )
     )
 
@@ -71,7 +71,8 @@
         PLAYER_TWO_INFO
         (get-uncurried-tic-tac-toe-puzzle CURRIED_TIC_TAC_TOE_PUZZLE) ; uncurry to get original tic_tac_toe_puzzle
         (a CURRIED_TIC_TAC_TOE_PUZZLE (list position)) ; get board result
-        amount
+        AMOUNT
         (get-next-player-from-curried-tic-tac-toe-puzzle CURRIED_TIC_TAC_TOE_PUZZLE) ; get next player
+        position
     )
 )
