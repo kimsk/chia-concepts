@@ -1,0 +1,77 @@
+;   MOD                         : the puzzle itself
+;   PLAYER_ONE_INFO             : (PK, PUZZLE_HASH), public key and puzzle hash of the first player
+;   PLAYER_TWO_INFO             : (PK, PUZZLE_HASH), public key and puzzle hash of the second player
+;   CURRIED_TIC_TAC_TOE_PUZZLE  : tic tac toe puzzle with curried-in current board and next player
+;   AMOUNT                      : coin amount (odd to be used with singleton top layer)
+;   position                    : next play position as inner solution for curried tic tac toe puzzle
+
+(mod (MOD PLAYER_ONE_INFO PLAYER_TWO_INFO CURRIED_TIC_TAC_TOE_PUZZLE amount position)
+    (include condition_codes.clib)
+    (include tic-tac-toe.clib)
+    (include utils.clib)
+
+    (defun create-new-coin (puzzle_hash amount)
+        (list
+            (list ASSERT_MY_AMOUNT amount)
+            (list CREATE_COIN puzzle_hash amount)
+        )
+    )
+
+    (defun p2-players (MOD (PLAYER_ONE_PK PLAYER_ONE_HASH) (PLAYER_TWO_PK PLAYER_TWO_HASH) tic_tac_toe_puzzle play_result next_board amount next_player)
+        (if (not (= 0 play_result))
+            (c
+                (list CREATE_COIN PLAYER_ONE_HASH -113) ; destroy a singleton coin
+                (if (= -1 play_result) ; tie game
+                    (list
+                        (list CREATE_COIN PLAYER_ONE_HASH 20)
+                        (list CREATE_COIN PLAYER_TWO_HASH 20)
+                    )
+                    (list
+                        (if (= 'x' play_result)
+                            (list CREATE_COIN PLAYER_ONE_HASH (- amount 1))
+                            (list CREATE_COIN PLAYER_TWO_HASH (- amount 1))
+                        )
+                    )
+                )
+            )
+            (create-new-coin
+                ; puzzle_hash
+                (sha256tree
+                    (curry
+                        MOD
+                        (list
+                            MOD
+                            (list PLAYER_ONE_PK PLAYER_ONE_HASH)
+                            (list PLAYER_TWO_PK PLAYER_TWO_HASH)
+                            (curry
+                                tic_tac_toe_puzzle 
+                                (list 
+                                    next_board
+                                    next_player
+                                )
+                            )
+                        )
+                    )
+                )
+                amount
+            )
+        )
+    )
+
+    (defun main (MOD (PLAYER_ONE_PK PLAYER_ONE_HASH) (PLAYER_TWO_PK PLAYER_TWO_HASH) tic_tac_toe_puzzle (play_result next_board) amount next_player)
+        (c 
+            (list AGG_SIG_ME (if (= 'x' next_player) PLAYER_ONE_PK PLAYER_TWO_PK) (sha256tree next_board))
+            (p2-players MOD (list PLAYER_ONE_PK PLAYER_ONE_HASH) (list PLAYER_TWO_PK PLAYER_TWO_HASH) tic_tac_toe_puzzle play_result next_board amount next_player)
+        )
+    )
+
+    (main
+        MOD
+        PLAYER_ONE_INFO
+        PLAYER_TWO_INFO
+        (get-uncurried-tic-tac-toe-puzzle CURRIED_TIC_TAC_TOE_PUZZLE) ; uncurry to get original tic_tac_toe_puzzle
+        (a CURRIED_TIC_TAC_TOE_PUZZLE (list position)) ; get board result
+        amount
+        (get-next-player-from-curried-tic-tac-toe-puzzle CURRIED_TIC_TAC_TOE_PUZZLE) ; get next player
+    )
+)

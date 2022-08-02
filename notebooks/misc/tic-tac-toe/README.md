@@ -19,3 +19,12 @@ In additions, as the game requires two players taking turn playing the game, onl
 We also need a way for two players to set up the game and place a wager in trustless manner. `ASSERT_ANNOUNCEMENT` and `ASSERT_*_RELATIVE` 
 
 Finally, depending on how the game end, the wager has to be distributed fairly.
+
+## Notebooks
+### [tic tac toe](tic-tac-toe.ipynb)
+![tic-tac-toe](tic-tac-toe.jpg)
+
+### [tic tac toe coin](tic-tac-toe-coin.ipynb)
+![tic-tact-toe-coin](tic-tac-toe-coin.jpg)
+
+### [singleton tic tac toe](singleton-tic-tac-toe.ipynb)

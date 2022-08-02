@@ -32,7 +32,7 @@ def play(curried_puzzle, position):
 # -1    tie
 #  0    playable
 #  120  player x wins
-#  113  player o wins
+#  111  player o wins
 def get_play_result(run_result):
     board_state = run_result.at("f").as_int()
     run_result_list = run_result.at("rf").as_atom_list()

@@ -109,9 +109,9 @@
     )
 
     (defun-inline get-next-player-from-curried-tic-tac-toe-puzzle (curried_puzzle)
-        (if (= (get-player-from-curried-tic-tac-toe-puzzle curried_puzzle) 1)
-            2
-            1
+        (if (= (get-player-from-curried-tic-tac-toe-puzzle curried_puzzle) 'x')
+            'o'
+            'x'
         )
     )
 
