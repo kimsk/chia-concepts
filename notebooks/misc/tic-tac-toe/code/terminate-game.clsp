@@ -1,0 +1,28 @@
+(mod (IS_SINGLETON PLAYER_ONE_HASH PLAYER_TWO_HASH P2_AMOUNT play_result)
+    (include condition_codes.clib)
+
+    (defun p2-players (PLAYER_ONE_HASH PLAYER_TWO_HASH P2_AMOUNT play_result)
+       (if (= -1 play_result)
+            ; tie game
+            (list
+                (list CREATE_COIN PLAYER_ONE_HASH P2_AMOUNT)
+                (list CREATE_COIN PLAYER_TWO_HASH P2_AMOUNT)
+            )
+            ; there is a winner
+            (list
+                (list CREATE_COIN
+                    (if (= 'x' play_result) PLAYER_ONE_HASH PLAYER_TWO_HASH)
+                    (* P2_AMOUNT 2) 
+                )
+            )
+        )
+    )
+
+    (if IS_SINGLETON
+        (c
+            (list CREATE_COIN PLAYER_ONE_HASH -113) ; destroy a singleton coin
+            (p2-players PLAYER_ONE_HASH PLAYER_TWO_HASH P2_AMOUNT play_result)
+        )
+        (p2-players PLAYER_ONE_HASH PLAYER_TWO_HASH P2_AMOUNT play_result)
+    )
+)

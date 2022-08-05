@@ -64,7 +64,7 @@ def get_curried_puzzles(
     return curried_puzzle, curried_coin_puzzle
 
 def get_curried_puzzle_from_curried_coin_puzzle(curried_coin_puzzle):
-    return curried_coin_puzzle.at("rrfrrfrrfrrfrfr")
+    return curried_coin_puzzle.at("rrfrrfrrfrrfrrfrfr")
 
 def get_board_from_curried_puzzle(curried_puzzle):
     board_from_puzzle = curried_puzzle.at("rrfrfr").as_atom_list()

@@ -24,6 +24,9 @@ Finally, depending on how the game end, the wager has to be distributed fairly.
 ### [tic tac toe](tic-tac-toe.ipynb)
 ![tic-tac-toe](tic-tac-toe.jpg)
 
+### [terminate game](terminate-game.ipynb)
+![terminate-game](terminate-game.jpg)
+
 ### [tic tac toe coin](coin.ipynb)
 ### [tic tac toe coin - blockchain simulator](coin-sim.ipynb)
 ![tic-tact-toe-coin](tic-tac-toe-coin.jpg)
