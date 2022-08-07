@@ -12,7 +12,7 @@ Like the [counter](../counter/README.md) example, this exmple demostrates the fo
     - [singleton_top_layer_v1_1.clvm](https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/singleton_top_layer_v1_1.clvm)
     - [singleton_top_layer_v1_1.py](https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/singleton_top_layer_v1_1.py)
 4. [Storing State](https://developers.chia.net/t/can-you-store-state-on-the-network/84)
-    - Deriving current state from previous coin spend
+    - deriving current state from previous coin spend using python.
 
 In additions, as the game requires two players taking turn playing the game, only one player at a time can spend the tic-tac-toe singleton coin. We will utilize [aggregated signature and assertion](https://chialisp.com/docs/security#signing-and-asserting-solution-truth) to prevent unauthorized user to tamper the game state.
 
