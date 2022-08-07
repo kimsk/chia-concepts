@@ -30,5 +30,7 @@ Finally, depending on how the game end, the wager has to be distributed fairly.
 ### [tic tac toe coin](coin.ipynb)
 ### [tic tac toe coin - blockchain simulator](coin-sim.ipynb)
 ![tic-tact-toe-coin](tic-tac-toe-coin.jpg)
+![creating-coin](creating-coin.jpg)
 
 ### [singleton tic tac toe](singleton-tic-tac-toe.ipynb)
+![singleton-tic-tac-toe](singleton-tic-tac-toe.jpg)
