@@ -8,7 +8,7 @@ In this example, we show how to implement a simple [Tic Tac Toe](https://en.wiki
         ---+---+---             ---+---+---
            | o | x         =>      | o | x 
         ---+---+---             ---+---+---
-           |   |                 o |   |   
+           |   |                 x |   |   
 
 ```
 ## Chia Concepts and Design Patterns
