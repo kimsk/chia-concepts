@@ -34,3 +34,4 @@ Finally, depending on how the game end, the wager has to be distributed fairly.
 
 ### [singleton tic tac toe](singleton-tic-tac-toe.ipynb)
 ![singleton-tic-tac-toe](singleton-tic-tac-toe.jpg)
+![create-singleton](creating-singleton-coin.jpg)
