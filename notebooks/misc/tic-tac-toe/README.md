@@ -4,11 +4,11 @@ In this example, we show how to implement a simple [Tic Tac Toe](https://en.wiki
 
 ```
  
- x | o | x               x | o | x 
----+---+---             ---+---+---
-   | o | x         =>      | o | x 
----+---+---             ---+---+---
-   |   |                 o |   |   
+         x | o | x               x | o | x 
+        ---+---+---             ---+---+---
+           | o | x         =>      | o | x 
+        ---+---+---             ---+---+---
+           |   |                 o |   |   
 
 ```
 ## Chia Concepts and Design Patterns
@@ -16,7 +16,7 @@ Like the [counter](../counter/README.md) example, this example demonstrates the 
 
 ### 1. [Outer and Inner Puzzles](https://chialisp.com/docs/common_functions#outer-and-inner-puzzles)
 
-> Outer and Inner Puzzle is a very powerful design pattern as it promote good software practices such ash separation of concern, composition, and unit testings. 
+> Outer and Inner Puzzle is a very powerful design pattern as it promotes good software practices such as separation of concern, composition, and unit testings. 
 
 > For example, singleton top layer puzzle only concerns about maintaining singleton rule while the tic tac toe coin puzzle doesn't need to know if it's wrapped inside the singleton top layer or not. 
 
@@ -95,7 +95,7 @@ Like the [counter](../counter/README.md) example, this example demonstrates the 
     AMOUNT
 )
 ```
-### 3. [Storing and Retreiving State](https://developers.chia.net/t/can-you-store-state-on-the-network/84)
+### 3. [Storing and Retrieving State](https://developers.chia.net/t/can-you-store-state-on-the-network/84)
 
 > From the curried puzzle, we could extract the curried values representing state that we want.
 
@@ -122,9 +122,11 @@ def get_player_from_curried_puzzle(curried_puzzle):
 ```
 ### 4. [Aggregated Signature](https://chialisp.com/docs/security#signing-and-asserting-solution-truth) (`AGG_SIG_ME`)
 
-> To create a two player game, we want two players to spend coins to create one coin.
+> To create a two player game, we want two players to spend their standard coins to create one tic tac toe coin.
 
 > Both coins have to be spent at the same time, so we put them in one spend bundle.
+
+> Each player can provide his/her signature to allow their coins to be spent, and we can aggregate them into the spend bundle.
 
 > NOTE: We could also use `ANNOUCEMENT`.
 
@@ -163,9 +165,11 @@ spend_bundle = SpendBundle(
 - [singleton_top_layer_v1_1.clvm](https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/singleton_top_layer_v1_1.clvm)
 - [singleton_top_layer_v1_1.py](https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/singleton_top_layer_v1_1.py)
 
-> Singleton is another important design pattern allowing coin set model to implement a unique identifier.
+> Singleton is another important design pattern allowing coin set model to implement a unique identifier (launcher id). 
 
-> In our example, we want to be able to access the on-going game (stored in coin) with a unique id.
+> The unique id allows us to access the on-going game (stored in coin).
+
+> The singleton puzzle guarantee that there is only one valid coin representing the game.
 
 ![create-singleton](creating-singleton-coin.jpg)
 
