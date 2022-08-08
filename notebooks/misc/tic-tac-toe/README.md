@@ -12,7 +12,7 @@ In this example, we show how to implement a simple [Tic Tac Toe](https://en.wiki
 
 ```
 ## Chia Concepts and Design Patterns
-Like the [counter](../counter/README.md) example, this exmple demostrates the following Chia concepts and design patterns:
+Like the [counter](../counter/README.md) example, this example demonstrates the following Chia concepts and design patterns:
 
 ### 1. [Outer and Inner Puzzles](https://chialisp.com/docs/common_functions#outer-and-inner-puzzles)
 
