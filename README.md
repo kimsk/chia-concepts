@@ -33,6 +33,7 @@ pip install jupyterlab_sos
 - [Automatic Counter](notebooks/misc/counter/README.md)
     - [Normal Coin](notebooks/misc/counter/create-coin.ipynb)
     - [Singleton Counter](notebooks/misc/counter/singleton-counter.ipynb)
+- [Tic Tac Toe](notebooks/misc/tic-tac-toe/README.md)
 
 ### Basic
 - [BLS]

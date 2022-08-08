@@ -1,0 +1,67 @@
+;   MOD                         : the puzzle itself
+;   TERMINATE_PUZZLE            : puzzle to be run when the game is terminated 
+;   PLAYER_ONE_INFO             : (PK, PUZZLE_HASH), public key and puzzle hash of the first player
+;   PLAYER_TWO_INFO             : (PK, PUZZLE_HASH), public key and puzzle hash of the second player
+;   CURRIED_TIC_TAC_TOE_PUZZLE  : tic tac toe puzzle with curried-in current board and next player
+;   AMOUNT                      : coin amount (odd to be used with singleton top layer)
+;   position                    : next play position as inner solution for curried tic tac toe puzzle
+
+(mod (MOD TERMINATE_PUZZLE PLAYER_ONE_INFO PLAYER_TWO_INFO CURRIED_TIC_TAC_TOE_PUZZLE AMOUNT position)
+    (include condition_codes.clib)
+    (include tic-tac-toe.clib)
+    (include utils.clib)
+
+    (defun create-new-coin (puzzle_hash AMOUNT)
+        (list
+            (list CREATE_COIN puzzle_hash AMOUNT)
+        )
+    )
+
+    (defun process-play-result (MOD TERMINATE_PUZZLE (PLAYER_ONE_PK PLAYER_ONE_HASH) (PLAYER_TWO_PK PLAYER_TWO_HASH) tic_tac_toe_puzzle play_result next_board AMOUNT next_player)
+        (if (= 0 play_result)
+            (create-new-coin
+                ; puzzle_hash
+                (sha256tree
+                    (curry
+                        MOD
+                        (list
+                            MOD
+                            TERMINATE_PUZZLE
+                            (list PLAYER_ONE_PK PLAYER_ONE_HASH)
+                            (list PLAYER_TWO_PK PLAYER_TWO_HASH)
+                            (curry
+                                tic_tac_toe_puzzle 
+                                (list 
+                                    next_board
+                                    next_player
+                                )
+                            )
+                            AMOUNT
+                        )
+                    )
+                )
+                AMOUNT
+            )
+            (a TERMINATE_PUZZLE (list play_result)) ; game is terminated
+        )
+    )
+
+    (defun main (MOD TERMINATE_PUZZLE (PLAYER_ONE_PK PLAYER_ONE_HASH) (PLAYER_TWO_PK PLAYER_TWO_HASH) tic_tac_toe_puzzle (play_result next_board) AMOUNT next_player position)
+        (c 
+            (list AGG_SIG_ME (if (= 'x' next_player) PLAYER_TWO_PK PLAYER_ONE_PK) (sha256 position))
+            (process-play-result MOD TERMINATE_PUZZLE (list PLAYER_ONE_PK PLAYER_ONE_HASH) (list PLAYER_TWO_PK PLAYER_TWO_HASH) tic_tac_toe_puzzle play_result next_board AMOUNT next_player)
+        )
+    )
+
+    (main
+        MOD
+        TERMINATE_PUZZLE
+        PLAYER_ONE_INFO
+        PLAYER_TWO_INFO
+        (get-uncurried-tic-tac-toe-puzzle CURRIED_TIC_TAC_TOE_PUZZLE) ; uncurry to get original tic_tac_toe_puzzle
+        (a CURRIED_TIC_TAC_TOE_PUZZLE (list position)) ; get board result
+        AMOUNT
+        (get-next-player-from-curried-tic-tac-toe-puzzle CURRIED_TIC_TAC_TOE_PUZZLE) ; get next player
+        position
+    )
+)
