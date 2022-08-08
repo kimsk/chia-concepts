@@ -194,4 +194,4 @@ spend_bundle = SpendBundle(
 2. [terminate game](terminate-game.ipynb)
 3. [tic tac toe coin](coin.ipynb)
 4. [tic tac toe coin - blockchain simulator](coin-sim.ipynb)
-5. [singleton tic tac toe](singleton-tic-tac-toe.ipynb)
+5. [singleton tic tac toe](singleton.ipynb)
