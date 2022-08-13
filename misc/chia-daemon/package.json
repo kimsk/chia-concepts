@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "chia-daemon": "^0.4.1"
+  },
+  "name": "test-chia-daemon",
+  "version": "1.0.0",
+  "main": "script.js",
+  "devDependencies": {},
+  "scripts": {
+    "start": "node script.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module"
+}
