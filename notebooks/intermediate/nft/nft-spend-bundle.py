@@ -22,6 +22,17 @@ from chia.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import (
     puzzle_for_pk,
     solution_for_conditions,
 )
+from chia.wallet.puzzles.puzzle_utils import (
+    make_assert_absolute_seconds_exceeds_condition,
+    make_assert_coin_announcement,
+    make_assert_my_coin_id_condition,
+    make_assert_puzzle_announcement,
+    make_create_coin_announcement,
+    make_create_coin_condition,
+    make_create_puzzle_announcement,
+    make_reserve_fee_condition,
+)
+
 from chia.wallet.nft_wallet.uncurry_nft import UncurriedNFT
 from chia.types.coin_spend import CoinSpend
 from chia.types.spend_bundle import SpendBundle
@@ -32,7 +43,8 @@ def print_json(dict):
 async def get_nft_coin_info(nft_id):
     try:
         db_version = 2
-        db_path = Path('/Users/karlkim/.chia/testnet10/wallet/db/blockchain_wallet_v2_r1_testnet10_3690011039.sqlite')
+        # db_path = Path('/Users/karlkim/.chia/testnet10/wallet/db/blockchain_wallet_v2_r1_testnet10_3690011039.sqlite')
+        db_path = Path('/mnt/e/testnet/wallet/db/blockchain_wallet_v2_r1_testnet10_4096957589.sqlite')
         connection = await aiosqlite.connect(db_path)
         db_wrapper = DBWrapper2(connection, db_version)
         read_connection = await aiosqlite.connect(db_path)
@@ -47,16 +59,19 @@ async def get_nft_coin_info(nft_id):
                 (nft_id,),
             )
 
-        nft_coin_info = NFTCoinInfo(
-                bytes32.from_hexstr(row[0]),
-                Coin.from_json_dict(json.loads(row[1])),
-                None if row[2] is None else LineageProof.from_json_dict(json.loads(row[2])),
-                Program.from_bytes(row[5]),
-                uint32(row[3]),
-                uint32(row[6]) if row[6] is not None else uint32(0),
-                row[4] == IN_TRANSACTION_STATUS,
-            )
-        return nft_coin_info
+        if row == None:
+            return None
+        else:
+            nft_coin_info = NFTCoinInfo(
+                    bytes32.from_hexstr(row[0]),
+                    Coin.from_json_dict(json.loads(row[1])),
+                    None if row[2] is None else LineageProof.from_json_dict(json.loads(row[2])),
+                    Program.from_bytes(row[5]),
+                    uint32(row[3]),
+                    uint32(row[6]) if row[6] is not None else uint32(0),
+                    row[4] == IN_TRANSACTION_STATUS,
+                )
+            return nft_coin_info
     finally: 
         await db_wrapper.close()
 
@@ -101,16 +116,29 @@ def make_solution(
             condition_list.append(make_assert_puzzle_announcement(announcement_hash))
     return solution_for_conditions(condition_list)
 
-# https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/nft_wallet/nft_wallet.py#L652
+# https://github.com/Chia-Network/chia-blockchain/blob/main/chia/rpc/wallet_rpc_api.py#L1593
+    # txs = await nft_wallet.generate_signed_transaction(
+    #     [uint64(nft_coin_info.coin.amount)],
+    #     [puzzle_hash],
+    #     coins={nft_coin_info.coin},
+    #     fee=fee,
+    #     new_owner=b"",
+    #     new_did_inner_hash=b"",
+    # )
+
 async def main():
-    nft_id = "8a5ffd6a6e33d3e095ea0338dbb0c5331be6ebc257d50e07e06f68c5692a29bf" 
+    # nft_id = "8a5ffd6a6e33d3e095ea0338dbb0c5331be6ebc257d50e07e06f68c5692a29bf"
+    nft_id = "9caea09e69d68d3f00a624202b24f06049d3b173f76713a327567e308e4790d8"
+    # txch1yw7a8qxzx0zsvrwgdenl9s8mtdlpgnjsramz5mtcd4nymz87szlqpcxdca
+    to_puzzle_hash = bytes32.from_hexstr("0x23bdd380c233c5060dc86e67f2c0fb5b7e144e501f762a6d786d664d88fe80be")
     nft_coin = await get_nft_coin_info(nft_id)
+    if nft_coin == None:
+        exit()
 
     # https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/nft_wallet/nft_wallet.py#L600
-    payments = []
+
     primaries: List = []
-    for payment in payments:
-        primaries.append({"puzzlehash": payment.puzzle_hash, "amount": payment.amount, "memos": payment.memos})
+    primaries.append({"puzzlehash": to_puzzle_hash, "amount": nft_coin.coin.amount, "memos": [to_puzzle_hash]})
             
     coin_announcements_bytes = None
     puzzle_announcements_bytes = None
