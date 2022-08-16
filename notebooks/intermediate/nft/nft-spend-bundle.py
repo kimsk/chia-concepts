@@ -1,24 +1,29 @@
-
-
-# SQLite
 import aiosqlite
 import asyncio
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
-from blspy import AugSchemeMPL, G2Element
+import sys
+sys.path.insert(0, ".")
+import keys_utils
+from blspy import AugSchemeMPL, G1Element, G2Element
+
+from chia.consensus.default_constants import DEFAULT_CONSTANTS
 from chia.types.blockchain_format.coin import Coin
 from chia.types.blockchain_format.program import Program
 from chia.types.blockchain_format.sized_bytes import bytes32
+from chia.util.condition_tools import conditions_dict_for_solution, pkm_pairs_for_conditions_dict
 from chia.util.db_wrapper import DBWrapper2, execute_fetchone
 from chia.util.ints import uint32
+from chia.wallet.derivation_record import DerivationRecord
 from chia.wallet.lineage_proof import LineageProof
 from chia.wallet.nft_wallet.nft_info import IN_TRANSACTION_STATUS, NFTCoinInfo, NFTWalletInfo
 from chia.wallet.util.wallet_types import AmountWithPuzzlehash, WalletType
 from chia.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import (
     DEFAULT_HIDDEN_PUZZLE_HASH,
     calculate_synthetic_secret_key,
+
     puzzle_for_pk,
     solution_for_conditions,
 )
@@ -40,14 +45,54 @@ from chia.types.spend_bundle import SpendBundle
 def print_json(dict):
     print(json.dumps(dict, sort_keys=True, indent=4))
 
+
+DB_VERSION = 2
+# DB_PATH = Path('/Users/karlkim/.chia/testnet10/wallet/db/blockchain_wallet_v2_r1_testnet10_3690011039.sqlite')
+FINGERPRINT = 4096957589
+DB_PATH = Path(f'/mnt/e/testnet/wallet/db/blockchain_wallet_v2_r1_testnet10_{FINGERPRINT}.sqlite')
+
+async def keys_for_puzzle_hash(puzzle_hash: bytes32):
+    try:
+        connection = await aiosqlite.connect(DB_PATH)
+        db_wrapper = DBWrapper2(connection, DB_VERSION)
+        read_connection = await aiosqlite.connect(DB_PATH)
+
+        await db_wrapper.add_connection(read_connection)
+
+        async with db_wrapper.reader_no_transaction() as conn:
+            row = await execute_fetchone(
+                conn,
+                "SELECT derivation_index, pubkey, puzzle_hash, wallet_type, wallet_id, hardened "
+                "FROM derivation_paths "
+                "WHERE puzzle_hash=?",
+                (puzzle_hash.hex(),),
+            )
+
+        if row is not None and row[0] is not None:
+            derivation_record = DerivationRecord(
+                uint32(row[0]),
+                bytes32.fromhex(row[2]),
+                G1Element.from_bytes(bytes.fromhex(row[1])),
+                WalletType(row[3]),
+                uint32(row[4]),
+                bool(row[5]),
+            )
+
+            # wallet hd-path (m/12381/8444/2/{idx})
+            hd_path = [12381, 8444, 2, derivation_record.index]
+            sk = await keys_utils.get_secret_key_async(FINGERPRINT, hd_path)
+            pk = sk.get_g1()
+            return sk, pk 
+
+        return None
+    finally: 
+        await db_wrapper.close()
+
 async def get_nft_coin_info(nft_id):
     try:
-        db_version = 2
-        # db_path = Path('/Users/karlkim/.chia/testnet10/wallet/db/blockchain_wallet_v2_r1_testnet10_3690011039.sqlite')
-        db_path = Path('/mnt/e/testnet/wallet/db/blockchain_wallet_v2_r1_testnet10_4096957589.sqlite')
-        connection = await aiosqlite.connect(db_path)
-        db_wrapper = DBWrapper2(connection, db_version)
-        read_connection = await aiosqlite.connect(db_path)
+        connection = await aiosqlite.connect(DB_PATH)
+        db_wrapper = DBWrapper2(connection, DB_VERSION)
+        read_connection = await aiosqlite.connect(DB_PATH)
 
         await db_wrapper.add_connection(read_connection)
 
@@ -59,19 +104,20 @@ async def get_nft_coin_info(nft_id):
                 (nft_id,),
             )
 
-        if row == None:
-            return None
-        else:
+        if row is not None and row[0] is not None:
+            full_puzzle = Program.from_bytes(row[5])
             nft_coin_info = NFTCoinInfo(
                     bytes32.from_hexstr(row[0]),
                     Coin.from_json_dict(json.loads(row[1])),
                     None if row[2] is None else LineageProof.from_json_dict(json.loads(row[2])),
-                    Program.from_bytes(row[5]),
+                    full_puzzle,
                     uint32(row[3]),
                     uint32(row[6]) if row[6] is not None else uint32(0),
                     row[4] == IN_TRANSACTION_STATUS,
-                )
+            )            
             return nft_coin_info
+
+        return None
     finally: 
         await db_wrapper.close()
 
@@ -131,14 +177,17 @@ async def main():
     nft_id = "9caea09e69d68d3f00a624202b24f06049d3b173f76713a327567e308e4790d8"
     # txch1yw7a8qxzx0zsvrwgdenl9s8mtdlpgnjsramz5mtcd4nymz87szlqpcxdca
     to_puzzle_hash = bytes32.from_hexstr("0x23bdd380c233c5060dc86e67f2c0fb5b7e144e501f762a6d786d664d88fe80be")
-    nft_coin = await get_nft_coin_info(nft_id)
-    if nft_coin == None:
-        exit()
+    nft_coin_info = await get_nft_coin_info(nft_id)
+    #print(nft_coin_info)
+    if nft_coin_info == None:
+        exit(1)
+
+    nft_coin = nft_coin_info.coin
 
     # https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/nft_wallet/nft_wallet.py#L600
 
     primaries: List = []
-    primaries.append({"puzzlehash": to_puzzle_hash, "amount": nft_coin.coin.amount, "memos": [to_puzzle_hash]})
+    primaries.append({"puzzlehash": to_puzzle_hash, "amount": nft_coin.amount, "memos": [to_puzzle_hash]})
             
     coin_announcements_bytes = None
     puzzle_announcements_bytes = None
@@ -159,15 +208,39 @@ async def main():
         puzzle_announcements_to_assert=puzzle_announcements_bytes,
     )
 
-    unft = UncurriedNFT.uncurry(*nft_coin.full_puzzle.uncurry())
+    unft = UncurriedNFT.uncurry(*nft_coin_info.full_puzzle.uncurry())
     if unft.supports_did:
         innersol = Program.to([innersol])
 
     nft_layer_solution = Program.to([innersol])
-    singleton_solution = Program.to([nft_coin.lineage_proof.to_program(), nft_coin.coin.amount, nft_layer_solution])
-    coin_spend = CoinSpend(nft_coin.coin, nft_coin.full_puzzle, singleton_solution)
+    singleton_solution = Program.to([nft_coin_info.lineage_proof.to_program(), nft_coin.amount, nft_layer_solution])
+    nft_coin_spend = CoinSpend(nft_coin, nft_coin_info.full_puzzle, singleton_solution)
 
-    nft_spend_bundle = SpendBundle([coin_spend], G2Element())
+    # get the valid signature
+    uncurried_nft = UncurriedNFT.uncurry(*nft_coin_spend.puzzle_reveal.to_program().uncurry())
+    ph = uncurried_nft.p2_puzzle.get_tree_hash()
+    sk, pk = await keys_for_puzzle_hash(ph)
+
+    synthetic_secret_key = calculate_synthetic_secret_key(sk, DEFAULT_HIDDEN_PUZZLE_HASH)
+    synthetic_pk = synthetic_secret_key.get_g1()
+
+    error, conditions, cost = conditions_dict_for_solution(
+        nft_coin_spend.puzzle_reveal.to_program(),
+        nft_coin_spend.solution.to_program(),
+        DEFAULT_CONSTANTS.MAX_BLOCK_COST_CLVM,
+    )
+
+    sigs = []
+    if conditions is not None:
+        for pk, msg in pkm_pairs_for_conditions_dict(
+            conditions, nft_coin_spend.coin.name(), DEFAULT_CONSTANTS.AGG_SIG_ME_ADDITIONAL_DATA
+        ):
+            sigs.append(AugSchemeMPL.sign(synthetic_secret_key, msg))
+
+    agg_sig = AugSchemeMPL.aggregate(sigs)
+
+    nft_spend_bundle = SpendBundle([nft_coin_spend], agg_sig)
+
     print_json(nft_spend_bundle.to_json_dict())
 
 asyncio.run(main())
