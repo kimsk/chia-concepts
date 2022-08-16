@@ -233,7 +233,7 @@ async def main():
     sigs = []
     if conditions is not None:
         for pk, msg in pkm_pairs_for_conditions_dict(
-            conditions, nft_coin_spend.coin.name(), DEFAULT_CONSTANTS.AGG_SIG_ME_ADDITIONAL_DATA
+            conditions, nft_coin_spend.coin.name(), bytes.fromhex(keys_utils.genesis_challenge)
         ):
             sigs.append(AugSchemeMPL.sign(synthetic_secret_key, msg))
 
@@ -241,6 +241,6 @@ async def main():
 
     nft_spend_bundle = SpendBundle([nft_coin_spend], agg_sig)
 
-    print_json(nft_spend_bundle.to_json_dict())
+    print_json(nft_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
 
 asyncio.run(main())
