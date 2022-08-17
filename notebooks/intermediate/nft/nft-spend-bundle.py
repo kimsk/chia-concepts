@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional, Set
 import sys
 sys.path.insert(0, ".")
 import keys_utils
+import full_node
 from blspy import AugSchemeMPL, G1Element, G2Element
 
 from chia.consensus.default_constants import DEFAULT_CONSTANTS
@@ -23,8 +24,8 @@ from chia.wallet.util.wallet_types import AmountWithPuzzlehash, WalletType
 from chia.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import (
     DEFAULT_HIDDEN_PUZZLE_HASH,
     calculate_synthetic_secret_key,
-
     puzzle_for_pk,
+    puzzle_for_conditions,
     solution_for_conditions,
 )
 from chia.wallet.puzzles.puzzle_utils import (
@@ -41,15 +42,19 @@ from chia.wallet.puzzles.puzzle_utils import (
 from chia.wallet.nft_wallet.uncurry_nft import UncurriedNFT
 from chia.types.coin_spend import CoinSpend
 from chia.types.spend_bundle import SpendBundle
+from chia.types.condition_opcodes import ConditionOpcode
+
 
 def print_json(dict):
     print(json.dumps(dict, sort_keys=True, indent=4))
 
 
+
 DB_VERSION = 2
-# DB_PATH = Path('/Users/karlkim/.chia/testnet10/wallet/db/blockchain_wallet_v2_r1_testnet10_3690011039.sqlite')
-FINGERPRINT = 4096957589
-DB_PATH = Path(f'/mnt/e/testnet/wallet/db/blockchain_wallet_v2_r1_testnet10_{FINGERPRINT}.sqlite')
+FINGERPRINT = 1094526214
+DB_PATH = Path(f'/Users/karlkim/.chia/testnet10/wallet/db/blockchain_wallet_v2_r1_testnet10_{FINGERPRINT}.sqlite')
+# FINGERPRINT = 4096957589
+# DB_PATH = Path(f'/mnt/e/testnet/wallet/db/blockchain_wallet_v2_r1_testnet10_{FINGERPRINT}.sqlite')
 
 async def get_derivation_record_for_puzzle_hash(puzzle_hash: bytes32):
     try:
@@ -129,6 +134,44 @@ async def get_nft_coin_info(nft_id):
     finally: 
         await db_wrapper.close()
 
+async def get_xch_coin_spend_with_signature(coin_id: bytes32):
+    coin_record = await full_node.get_coin_record_by_name_async(coin_id)
+    coin = coin_record.coin
+    sk, pk = await keys_for_puzzle_hash(coin.puzzle_hash)
+    # print(coin_record)
+    # print(sk)
+    # print(pk)
+
+    fee = 2_000
+
+    puzzle_reveal = puzzle_for_pk(pk)
+    conditions = [
+        [ConditionOpcode.CREATE_COIN, coin.puzzle_hash, coin.amount - fee]
+    ]
+        
+    delegated_puzzle: Program = puzzle_for_conditions(conditions) 
+    solution = solution_for_conditions(conditions)
+
+    coin_spend = CoinSpend(
+            coin,
+            puzzle_reveal,
+            solution,
+    )
+    
+    synthetic_sk: PrivateKey = calculate_synthetic_secret_key(
+        sk,
+        DEFAULT_HIDDEN_PUZZLE_HASH
+    )
+
+    sig = AugSchemeMPL.sign(synthetic_sk,
+        (
+            delegated_puzzle.get_tree_hash()
+            + coin.name()
+            + bytes.fromhex(keys_utils.genesis_challenge)
+        )
+    )
+    return coin_spend, sig
+
 def make_solution(
     primaries: List[AmountWithPuzzlehash],
     min_time=0,
@@ -181,18 +224,28 @@ def make_solution(
     # )
 
 async def main():
+    coin_id = bytes32.from_hexstr("0x7a30d41e520f7ff00ca88d8875d3d81ff9bff301b67c6cf2e9a4054d7f32618c")
+    coin_spend, coin_sig = await get_xch_coin_spend_with_signature(coin_id)
+    # coin_spend_bundle = SpendBundle([coin_spend], coin_sig)
+    # print_json(coin_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))    
+    # exit()
     # nft_id = "8a5ffd6a6e33d3e095ea0338dbb0c5331be6ebc257d50e07e06f68c5692a29bf"
     # nft_id = "9caea09e69d68d3f00a624202b24f06049d3b173f76713a327567e308e4790d8" # without DID
 
     # nft_id = "c46983b231c50c2e863fd7e1511f4723e502a1a5d80e432154df48ea79566a5e" # with DID
-    nft_id = "5d9858cb9ed67dbd1e8d72b249da1bfac6438c0aa29a794d6e4f9638cd1f4258" # with DID
+    # nft_id = "5d9858cb9ed67dbd1e8d72b249da1bfac6438c0aa29a794d6e4f9638cd1f4258" # with DID
+    nft_id = "aa91bb6bcec90b2fd34247a324ef66d80a84f2926d184dcad694f7fc1104bcf6" # with DID, MBA
+
     # https://github.com/Chia-Network/chia-blockchain/blob/main/chia/rpc/wallet_rpc_api.py#L1609
     
     # txch1yw7a8qxzx0zsvrwgdenl9s8mtdlpgnjsramz5mtcd4nymz87szlqpcxdca
     # to_puzzle_hash = bytes32.from_hexstr("0x23bdd380c233c5060dc86e67f2c0fb5b7e144e501f762a6d786d664d88fe80be")
 
     # txch1wguv57xlcfc9r02lxf0nkw7332l6pq24wy8c2gf8rymw9z8005gq5sy5ss
-    to_puzzle_hash = bytes32.from_hexstr("0x7238ca78dfc27051bd5f325f3b3bd18abfa08155710f8521271936e288ef7d10")
+    # to_puzzle_hash = bytes32.from_hexstr("0x7238ca78dfc27051bd5f325f3b3bd18abfa08155710f8521271936e288ef7d10")
+
+    # txch14dt7eugam2jlkfz6qnd7735fuygqz8uyytwaqpdaqeuql5az0h7s7pf6w8
+    to_puzzle_hash = bytes32.from_hexstr("0xe8f27d2d5b2fa0faef67eee1840b2ba531a14fad56379b645c947c44f73f6ab8")
 
     nft_coin_info = await get_nft_coin_info(nft_id)
     #print(nft_coin_info)
@@ -236,7 +289,6 @@ async def main():
     innersol = Program.to([[], (1, magic_condition.cons(innersol.at("rfr"))), []])
     innersol = Program.to([innersol])
 
-
     nft_layer_solution = Program.to([innersol])
     singleton_solution = Program.to([nft_coin_info.lineage_proof.to_program(), nft_coin.amount, nft_layer_solution])
     nft_coin_spend = CoinSpend(nft_coin, nft_coin_info.full_puzzle, singleton_solution)
@@ -255,7 +307,7 @@ async def main():
         DEFAULT_CONSTANTS.MAX_BLOCK_COST_CLVM,
     )
 
-    sigs = []
+    sigs = [coin_sig]
     if conditions is not None:
         for pk, msg in pkm_pairs_for_conditions_dict(
             conditions, nft_coin_spend.coin.name(), bytes.fromhex(keys_utils.genesis_challenge)
@@ -264,8 +316,7 @@ async def main():
 
     agg_sig = AugSchemeMPL.aggregate(sigs)
 
-    nft_spend_bundle = SpendBundle([nft_coin_spend], agg_sig)
-
+    nft_spend_bundle = SpendBundle([nft_coin_spend, coin_spend], agg_sig)
     print_json(nft_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))
 
 asyncio.run(main())
