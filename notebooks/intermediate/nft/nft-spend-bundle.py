@@ -51,7 +51,7 @@ DB_VERSION = 2
 FINGERPRINT = 4096957589
 DB_PATH = Path(f'/mnt/e/testnet/wallet/db/blockchain_wallet_v2_r1_testnet10_{FINGERPRINT}.sqlite')
 
-async def keys_for_puzzle_hash(puzzle_hash: bytes32):
+async def get_derivation_record_for_puzzle_hash(puzzle_hash: bytes32):
     try:
         connection = await aiosqlite.connect(DB_PATH)
         db_wrapper = DBWrapper2(connection, DB_VERSION)
@@ -77,16 +77,24 @@ async def keys_for_puzzle_hash(puzzle_hash: bytes32):
                 uint32(row[4]),
                 bool(row[5]),
             )
-
-            # wallet hd-path (m/12381/8444/2/{idx})
-            hd_path = [12381, 8444, 2, derivation_record.index]
-            sk = await keys_utils.get_secret_key_async(FINGERPRINT, hd_path)
-            pk = sk.get_g1()
-            return sk, pk 
+            
+            return derivation_record
 
         return None
     finally: 
         await db_wrapper.close()
+    
+async def keys_for_puzzle_hash(puzzle_hash: bytes32):
+    derivation_record = await get_derivation_record_for_puzzle_hash(puzzle_hash)
+    
+    if derivation_record is not None:
+        # wallet hd-path (m/12381/8444/2/{idx})
+        hd_path = [12381, 8444, 2, derivation_record.index]
+        sk = await keys_utils.get_secret_key_async(FINGERPRINT, hd_path)
+        pk = sk.get_g1()
+        return sk, pk 
+
+    return None, None
 
 async def get_nft_coin_info(nft_id):
     try:
@@ -174,9 +182,18 @@ def make_solution(
 
 async def main():
     # nft_id = "8a5ffd6a6e33d3e095ea0338dbb0c5331be6ebc257d50e07e06f68c5692a29bf"
-    nft_id = "9caea09e69d68d3f00a624202b24f06049d3b173f76713a327567e308e4790d8"
+    # nft_id = "9caea09e69d68d3f00a624202b24f06049d3b173f76713a327567e308e4790d8" # without DID
+
+    # nft_id = "c46983b231c50c2e863fd7e1511f4723e502a1a5d80e432154df48ea79566a5e" # with DID
+    nft_id = "5d9858cb9ed67dbd1e8d72b249da1bfac6438c0aa29a794d6e4f9638cd1f4258" # with DID
+    # https://github.com/Chia-Network/chia-blockchain/blob/main/chia/rpc/wallet_rpc_api.py#L1609
+    
     # txch1yw7a8qxzx0zsvrwgdenl9s8mtdlpgnjsramz5mtcd4nymz87szlqpcxdca
-    to_puzzle_hash = bytes32.from_hexstr("0x23bdd380c233c5060dc86e67f2c0fb5b7e144e501f762a6d786d664d88fe80be")
+    # to_puzzle_hash = bytes32.from_hexstr("0x23bdd380c233c5060dc86e67f2c0fb5b7e144e501f762a6d786d664d88fe80be")
+
+    # txch1wguv57xlcfc9r02lxf0nkw7332l6pq24wy8c2gf8rymw9z8005gq5sy5ss
+    to_puzzle_hash = bytes32.from_hexstr("0x7238ca78dfc27051bd5f325f3b3bd18abfa08155710f8521271936e288ef7d10")
+
     nft_coin_info = await get_nft_coin_info(nft_id)
     #print(nft_coin_info)
     if nft_coin_info == None:
@@ -209,8 +226,16 @@ async def main():
     )
 
     unft = UncurriedNFT.uncurry(*nft_coin_info.full_puzzle.uncurry())
-    if unft.supports_did:
-        innersol = Program.to([innersol])
+
+    # reset DID owner
+    # https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/nft_wallet/nft_wallet.py#L715
+    new_owner = b""
+    new_did_inner_hash = b""
+    trade_prices_list = None
+    magic_condition = Program.to([-10, new_owner, trade_prices_list, new_did_inner_hash])
+    innersol = Program.to([[], (1, magic_condition.cons(innersol.at("rfr"))), []])
+    innersol = Program.to([innersol])
+
 
     nft_layer_solution = Program.to([innersol])
     singleton_solution = Program.to([nft_coin_info.lineage_proof.to_program(), nft_coin.amount, nft_layer_solution])
