@@ -173,16 +173,8 @@ async def get_xch_coin_spend_with_signature(coin_id: bytes32):
     return coin_spend, sig
 
 def make_solution(
-    primaries: List[AmountWithPuzzlehash],
-    min_time=0,
-    me=None,
-    coin_announcements: Optional[Set[bytes]] = None,
-    coin_announcements_to_assert: Optional[Set[bytes32]] = None,
-    puzzle_announcements: Optional[Set[bytes]] = None,
-    puzzle_announcements_to_assert: Optional[Set[bytes32]] = None,
-    fee=0,
+    primaries: List[AmountWithPuzzlehash]
 ) -> Program:
-    assert fee >= 0
     condition_list = []
     if len(primaries) > 0:
         for primary in primaries:
@@ -193,24 +185,6 @@ def make_solution(
             else:
                 memos = None
             condition_list.append(make_create_coin_condition(primary["puzzlehash"], primary["amount"], memos))
-    if min_time > 0:
-        condition_list.append(make_assert_absolute_seconds_exceeds_condition(min_time))
-    if me:
-        condition_list.append(make_assert_my_coin_id_condition(me["id"]))
-    if fee:
-        condition_list.append(make_reserve_fee_condition(fee))
-    if coin_announcements:
-        for announcement in coin_announcements:
-            condition_list.append(make_create_coin_announcement(announcement))
-    if coin_announcements_to_assert:
-        for announcement_hash in coin_announcements_to_assert:
-            condition_list.append(make_assert_coin_announcement(announcement_hash))
-    if puzzle_announcements:
-        for announcement in puzzle_announcements:
-            condition_list.append(make_create_puzzle_announcement(announcement))
-    if puzzle_announcements_to_assert:
-        for announcement_hash in puzzle_announcements_to_assert:
-            condition_list.append(make_assert_puzzle_announcement(announcement_hash))
     return solution_for_conditions(condition_list)
 
 # https://github.com/Chia-Network/chia-blockchain/blob/main/chia/rpc/wallet_rpc_api.py#L1593
@@ -224,8 +198,10 @@ def make_solution(
     # )
 
 async def main():
-    coin_id = bytes32.from_hexstr("0x7a30d41e520f7ff00ca88d8875d3d81ff9bff301b67c6cf2e9a4054d7f32618c")
+    # coin_id = bytes32.from_hexstr("0x7a30d41e520f7ff00ca88d8875d3d81ff9bff301b67c6cf2e9a4054d7f32618c")
+    coin_id = bytes32.from_hexstr("0x7a30d41e520f7ff00ca88d8875d3d81ff9bff301b67c6cf2e9a4054d7f32618c") 
     coin_spend, coin_sig = await get_xch_coin_spend_with_signature(coin_id)
+
     # coin_spend_bundle = SpendBundle([coin_spend], coin_sig)
     # print_json(coin_spend_bundle.to_json_dict(include_legacy_keys = False, exclude_modern_keys = False))    
     # exit()
@@ -234,7 +210,8 @@ async def main():
 
     # nft_id = "c46983b231c50c2e863fd7e1511f4723e502a1a5d80e432154df48ea79566a5e" # with DID
     # nft_id = "5d9858cb9ed67dbd1e8d72b249da1bfac6438c0aa29a794d6e4f9638cd1f4258" # with DID
-    nft_id = "aa91bb6bcec90b2fd34247a324ef66d80a84f2926d184dcad694f7fc1104bcf6" # with DID, MBA
+    # nft_id = "aa91bb6bcec90b2fd34247a324ef66d80a84f2926d184dcad694f7fc1104bcf6" # with DID, MBA
+    nft_id = "73bb7190d270671e5674adca9c3a0e1cda3df4af5aab93a40db4a2fc710e1e4a" # with DID, MBA
 
     # https://github.com/Chia-Network/chia-blockchain/blob/main/chia/rpc/wallet_rpc_api.py#L1609
     
@@ -258,24 +235,9 @@ async def main():
 
     primaries: List = []
     primaries.append({"puzzlehash": to_puzzle_hash, "amount": nft_coin.amount, "memos": [to_puzzle_hash]})
-            
-    coin_announcements_bytes = None
-    puzzle_announcements_bytes = None
-
-    # FEE COIN
-    # if fee > 0:
-    #     announcement_to_make = nft_coin.coin.name()
-    #     chia_tx = await self.create_tandem_xch_tx(fee, Announcement(nft_coin.coin.name(), announcement_to_make))
-    # else:
-    #     announcement_to_make = None
-    #     chia_tx = None
-    announcement_to_make = None
 
     innersol: Program = make_solution(
-        primaries=primaries,
-        coin_announcements=None if announcement_to_make is None else set((announcement_to_make,)),
-        coin_announcements_to_assert=coin_announcements_bytes,
-        puzzle_announcements_to_assert=puzzle_announcements_bytes,
+        primaries=primaries
     )
 
     unft = UncurriedNFT.uncurry(*nft_coin_info.full_puzzle.uncurry())
