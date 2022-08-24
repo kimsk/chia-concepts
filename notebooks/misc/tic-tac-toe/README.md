@@ -18,15 +18,15 @@ Like the [counter](../counter/README.md) example, this example demonstrates the 
 
 ### 1. [Outer and Inner Puzzles](https://chialisp.com/docs/common_functions#outer-and-inner-puzzles)
 
-> Outer and Inner Puzzle is a very powerful design pattern as it promotes good software practices such as separation of concern, composition, and unit testings. 
+> Outer and Inner Puzzle is a very powerful design pattern as it promotes good software engineering practices such as [separation of concerns](https://en.wikipedia.org/wiki/Separation_of_concerns), [composition](https://en.wikipedia.org/wiki/Object_composition), and [unit testings](https://en.wikipedia.org/wiki/Unit_testing). 
 
-> For example, singleton top layer puzzle only concerns about maintaining singleton rule while the tic tac toe coin puzzle doesn't need to know if it's wrapped inside the singleton top layer or not. 
+> For example, [singleton top layer puzzle](https://github.com/kimsk/chia-concepts/blob/main/notebooks/intermediate/singleton/notebook.ipynb) only concerns about maintaining [singleton rules](https://chialisp.com/docs/puzzles/singletons#design-choices) while the [tic tac toe coin puzzle](https://github.com/kimsk/chia-concepts/blob/main/notebooks/misc/tic-tac-toe/code/coin.clsp) doesn't need to know if it's wrapped inside the singleton top layer or not. 
 
-> The tic tac toe puzzle doesn't need to know if it's stand alone puzzle or if it's wrapped inside any puzzle.
+> The [tic tac toe puzzle](https://github.com/kimsk/chia-concepts/blob/main/notebooks/misc/tic-tac-toe/code/tic-tac-toe.clsp) doesn't need to know if it's stand alone puzzle or if it's wrapped inside any puzzle.
 
-> We inject different terminate game puzzle to control how tic tac toe coin output the conditions. For example, the tic tac toe coin that will be wrapped inside the singleton top layer coin require `CREATE_COIN 0x... -113` to terminate the singleton coin.
+> We inject different [terminate game puzzle](https://github.com/kimsk/chia-concepts/blob/main/notebooks/misc/tic-tac-toe/code/terminate-game.clsp) to control how tic tac toe coin output the conditions. For example, the [tic tac toe coin](https://github.com/kimsk/chia-concepts/blob/main/notebooks/misc/tic-tac-toe/code/coin.clsp) that will be wrapped inside the [singleton top layer puzzle](https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/singleton_top_layer_v1_1.clvm#L55) require `CREATE_COIN 0x... -113` to melt the singleton coin.
 
-> If you have OOP background, this is also similar to dependency injection. 
+> This is also similar to [Dependency injection design pattern](https://en.wikipedia.org/wiki/Dependency_injection). 
 
 ```
     +---------------------+
