@@ -1,4 +1,5 @@
-[在Chia上的井字小游戏](https://mp.weixin.qq.com/s/-lFA40OUjC3AtKHbjcjZcw)
+- [在Chia上的井字小游戏](https://mp.weixin.qq.com/s/-lFA40OUjC3AtKHbjcjZcw)
+- [เกม ทิก-แทก-โท](README-th.md)
 
 # Tic Tac Toe
 
@@ -6,11 +7,11 @@ In this example, we show how to implement a simple [Tic Tac Toe](https://en.wiki
 
 ```
  
-         x | o | x               x | o | x 
-        ---+---+---             ---+---+---
-           | o | x         =>      | o | x 
-        ---+---+---             ---+---+---
-           |   |                 x |   |   
+         x | o | x             x | o | x 
+        ---+---+---           ---+---+---
+           | o | x       =>      | o | x 
+        ---+---+---           ---+---+---
+           |   |               x |   |   
 
 ```
 ## Chia Concepts and Design Patterns
@@ -70,7 +71,7 @@ Like the [counter](../counter/README.md) example, this example demonstrates the 
 )
 ```
 
-> We can create a next puzzle and calculate the puzzle hash. 
+> We can also curry the curried puzzle to create a next puzzle and calculate its puzzle hash. 
 
 ```lisp
 (create-new-coin
@@ -99,7 +100,7 @@ Like the [counter](../counter/README.md) example, this example demonstrates the 
 ```
 ### 3. [Storing and Retrieving State](https://developers.chia.net/t/can-you-store-state-on-the-network/84)
 
-> From the curried puzzle, we could extract the curried values representing state that we want.
+> From the curried puzzle (`puzzle_reveal` is available on blockchain once the coin is spent), we could extract the curried values representing state that we want.
 
 ```lisp
 (defun-inline get-player-from-curried-tic-tac-toe-puzzle (curried_puzzle)
@@ -130,8 +131,6 @@ def get_player_from_curried_puzzle(curried_puzzle):
 
 > Each player can provide his/her signature to allow their coins to be spent, and we can aggregate them into the spend bundle.
 
-> NOTE: We could also use `ANNOUCEMENT`.
-
 ```python
 coin_message = (
     std_hash(int_to_bytes(position))
@@ -150,11 +149,13 @@ coin_spend = CoinSpend(
     curried_coin_puzzle,
     Program.to([position]) # position
 )
+
+# aggregate alice and bob's signatures
+agg_sig = AugSchemeMPL.aggregate([alice_signature, bob_signature])
 ```
 
 ### 5. [Spend Bundles](https://chialisp.com/docs/coin_lifecycle#spend-bundles)
 ```python
-agg_sig = AugSchemeMPL.aggregate([alice_signature, bob_signature])
 spend_bundle = SpendBundle(
     [alice_coin_spend, bob_coin_spend], # coin spends
     agg_sig # aggregated signature
@@ -167,11 +168,11 @@ spend_bundle = SpendBundle(
 - [singleton_top_layer_v1_1.clvm](https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/singleton_top_layer_v1_1.clvm)
 - [singleton_top_layer_v1_1.py](https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/singleton_top_layer_v1_1.py)
 
-> Singleton is another important design pattern allowing coin set model to implement a unique identifier (launcher id). 
+> Singleton is another important design pattern allowing coin set model to implement a coin and puzzle with unique identifier (launcher id). 
 
 > The unique id allows us to access the on-going game (stored in coin).
 
-> The singleton puzzle guarantee that there is only one valid coin representing the game.
+> The singleton puzzle guarantees that there is only one valid coin representing the individual game.
 
 ![create-singleton](creating-singleton-coin.jpg)
 
