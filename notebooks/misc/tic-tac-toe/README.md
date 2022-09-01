@@ -43,10 +43,10 @@ Like the [counter](../counter/README.md) example, this example demonstrates the 
 
 ### 2. [Currying](https://chialisp.com/docs/common_functions#currying)
 
-#### Pre-commit Enviroment and Store State
+#### Pre-commit Environment and Store State
 > Currying allows us to customize the puzzle to be reused in different siutation.
 
-> Since Chialisp is a pure functional programming language, it only relies on input for its environment. In this tic tac toe example, we use currying to pre-commit environment as well as storing the state.
+> Since Chialisp is a pure functional programming language, it only relies on input for its environment. 
 
 > Current board and next player (`x` or `o`) are curried in as a current state and playing the game only requires position.
 
