@@ -1,0 +1,38 @@
+(
+    ("name" "Chia Holiday 2021")
+    ("asset_id" 0x509deafe3cd8bbfbb9ccce1d930e3d7b57b40c964fa33379b18d628175eb7a8f)
+    ("issuer" "Chia Network")
+    ("supply" 3000000)
+    ("description" 
+        "This token was airdropped into every wallet that received a farmer reward for a block between the launch of Mainnet on March 19th, 2021 and Christmas Day 2021."
+    )
+    ("chialisp"
+        (mod (
+            PUBKEY
+            Truths
+            parent_is_cat
+            lineage_proof
+            delta
+            inner_conditions
+            (
+                delegated_puzzle
+                delegated_solution
+            )
+            )
+
+            (include condition_codes.clvm)
+
+            (defun sha256tree1 (TREE)
+                (if (l TREE)
+                    (sha256 2 (sha256tree1 (f TREE)) (sha256tree1 (r TREE)))
+                    (sha256 1 TREE)))
+
+            (c (list AGG_SIG_UNSAFE PUBKEY (sha256tree1 delegated_puzzle))
+            (a delegated_puzzle (c Truths (c parent_is_cat (c lineage_proof (c delta (c inner_conditions delegated_solution))))))
+            )
+        )
+    )
+    ("clvm"
+        (a (q 2 (q 4 (c 4 (c 5 (c (a 6 (c 2 (c 639 ()))) ()))) (a 639 (c 11 (c 23 (c 47 (c 95 (c -65 1407))))))) (c (q 49 2 (i (l 5) (q 11 (q . 2) (a 6 (c 2 (c 9 ()))) (a 6 (c 2 (c 13 ())))) (q 11 (q . 1) 5)) 1) 1)) (c (q . 0xb1daa96d1fa197cbe77b16c9865acd72ed58cf675c5567942c1004e3c992a01fed8d756ab3c5b8da950b9aa922df98e3) 1))
+    )
+)
