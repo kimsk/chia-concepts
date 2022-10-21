@@ -1,0 +1,29 @@
+(mod (FN . input_list)
+    (defun rec (FN acc lst)
+        (if lst
+            (rec FN
+                (if (a FN (f lst))
+                    (c
+                        (f lst)
+                        acc
+                    )
+                    acc
+                )
+                (r lst) 
+            )
+            acc
+        )
+    )
+
+    (defun rev (acc lst)
+        (if lst
+            (rev (c (f lst) acc) (r lst))
+            acc
+        )
+    )
+
+    (rev
+        ()
+        (rec FN () input_list)
+    )
+)
