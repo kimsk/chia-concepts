@@ -1,0 +1,16 @@
+(mod (Functions . input_list)
+    (defun rec (functions input)
+        (if functions
+            (rec
+                (r functions)
+                (a (f functions) input)
+            )
+            input
+        )
+    )
+
+    (rec
+        Functions
+        input_list
+    )
+)

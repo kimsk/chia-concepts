@@ -1,0 +1,12 @@
+(mod (FN . input_list)
+    (defun rec (FN lst)
+        (if lst
+            (c
+                (a FN (f lst))
+                (rec FN (r lst))
+            )
+            () 
+        )
+    )
+    (rec FN input_list)
+)
