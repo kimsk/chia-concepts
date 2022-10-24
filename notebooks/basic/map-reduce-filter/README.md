@@ -1,4 +1,7 @@
+- [Lisp in 100 Seconds](https://www.youtube.com/watch?v=INUHCQST7CU)
+
 - [The power of Python Map, Reduce and Filter – Functional Programming for Data Science](https://www.analyticsvidhya.com/blog/2021/09/the-power-of-python-map-reduce-and-filter-functional-programming-for-data-science/)
+
 - [The Holy Trinity of Functional Programming: Map, Filter and Reduce](https://dev.to/mlevkov/the-holy-trinity-map-filter-and-reduce-381e)
 
 ## Map
@@ -28,6 +31,17 @@ cost = 8815
 ("rec" (+ 1 1) (37 53)) => (74 106)
 ("rec" (+ 1 1) (53)) => (106)
 ("rec" (+ 1 1) ()) => ()
+
+# triple
+❯ brun (cdv clsp curry ./map.clsp -a '(+ 1 1 1)') '(42 72 37 53)' -c -y main.sym                                           
+cost = 10293
+(126 216 111 159)
+
+("rec" (+ 1 1 1) (42 72 37 53)) => (126 216 111 159)
+("rec" (+ 1 1 1) (72 37 53)) => (216 111 159)
+("rec" (+ 1 1 1) (37 53)) => (111 159)
+("rec" (+ 1 1 1) (53)) => (159)
+("rec" (+ 1 1 1) ()) => ()
 
 # squre
 ❯ brun (cdv clsp curry ./map.clsp -a '(* 1 1)') '(42 72 37 53)' -c -y main.sym 
@@ -136,7 +150,14 @@ cost = 14403
 ("rev" (112 130 45) ()) => (112 130 45)
 ```
 
+## Chaining
+
+```
+❯ cdv clsp curry ./map.clsp -a '(+ 1 1)'                                                                              
+(a (q 2 (q 2 2 (c 2 (c 5 (c 7 ())))) (c (q 2 (i 11 (q 4 (a 5 19) (a 2 (c 2 (c 5 (c 27 ()))))) ()) 1) 1)) (c (q 16 1 1) 1))
+
+```
 
 
-## Map & Reduce
+
 
