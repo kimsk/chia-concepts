@@ -36,6 +36,7 @@ pip install jupyterlab_sos
 - [Tic Tac Toe](notebooks/misc/tic-tac-toe/README.md)
 
 ### Basic
+- [Map/Reduce/Filter](notebooks/basic/map-reduce-filter/notebook.ipynb)
 - [BLS]
 - [Coins](notebooks/basic/coins/notebook.ipynb)
 - [Merkel Tree]
