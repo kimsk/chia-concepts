@@ -46,5 +46,5 @@
 - [ChiaLisp & Decentralized Identity](https://www.youtube.com/watch?v=zAG9KeMTZw8)
 - [DID RPCs](https://docs.chia.net/docs/12rpcs/did_rpcs)
 - [DID CLI Reference](https://docs.chia.net/docs/13cli/did_cli)
-
+- [DIDs](https://chialisp.com/dids)
 - [generate_new_decentralised_id](https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/did_wallet/did_wallet.py#L1108)
