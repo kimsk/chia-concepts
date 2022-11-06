@@ -36,12 +36,11 @@ pip install jupyterlab_sos
 - [Tic Tac Toe](notebooks/misc/tic-tac-toe/README.md)
 
 ### Basic
-- [Map/Reduce/Filter](notebooks/basic/map-reduce-filter/notebook.ipynb)
 - [BLS]
 - [Coins](notebooks/basic/coins/notebook.ipynb)
 - [Merkel Tree]
 - [Outer and Inner Puzzle](/notebooks/basic/outer-and-inner-puzzles/notebook.ipynb)
-- [Map/Reduce/Filter](/notebooks/basic/map-reduce-filter/README.md)
+- [Map/Reduce/Filter](notebooks/basic/map-reduce-filter/notebook.ipynb)
 ### Intermediate
 - [DIDs](notebooks/intermediate/dids/README.md)
 - [Singleton](notebooks/intermediate/singleton/notebook.ipynb)
