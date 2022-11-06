@@ -16,11 +16,11 @@
 
 ตัวอย่างนี้คล้ายๆกับ [counter](../counter/README.md) ที่นำแนวคิดและ Design Patterns มาใช้
 
-### 1. [Outer and Inner Puzzles](https://chialisp.com/docs/common_functions#outer-and-inner-puzzles)
+### 1. [Outer and Inner Puzzles](https://devs.chia.net/guides/chialisp-inner-puzzles/)
 
 > Outer and Inner Puzzle เป็น design pattern ที่ส่งเสริมแนวปฏิบัติการสร้างซอฟต์แวร์ที่ดีเช่น [separation of concerns](https://en.wikipedia.org/wiki/Separation_of_concerns), [composition](https://en.wikipedia.org/wiki/Object_composition), and [unit testings](https://en.wikipedia.org/wiki/Unit_testing)
 
-> งานของ [singleton top layer puzzle](https://github.com/kimsk/chia-concepts/blob/main/notebooks/intermediate/singleton/notebook.ipynb) คือการควบคุม[กฎของ singleton](https://github.com/kimsk/chia-concepts/blob/main/notebooks/intermediate/singleton/notebook.ipynb) เท่านั้น ในขณะที่ [tic tac toe coin puzzle](https://github.com/kimsk/chia-concepts/blob/main/notebooks/misc/tic-tac-toe/code/coin.clsp) ไม่จำเป็นต้องรู้ด้วยว่าตัวมันเองถูกใช้ใน singlton top layer puzzle อีกที
+> งานของ [singleton top layer puzzle](https://github.com/kimsk/chia-concepts/blob/main/notebooks/intermediate/singleton/notebook.ipynb) คือการควบคุม[กฎของ singleton](https://chialisp.com/singletons#design-decisions) เท่านั้น ในขณะที่ [tic tac toe coin puzzle](https://github.com/kimsk/chia-concepts/blob/main/notebooks/misc/tic-tac-toe/code/coin.clsp) ไม่จำเป็นต้องรู้ด้วยว่าตัวมันเองถูกใช้ใน singlton top layer puzzle อีกที
 
 > [tic tac toe puzzle](https://github.com/kimsk/chia-concepts/blob/main/notebooks/misc/tic-tac-toe/code/tic-tac-toe.clsp) ไม่จำเป็นต้องรู้ว่ากำลังถูกใช้โดย puzzle อื่นหรือกำงานด้วยตัวมันเอง
 
@@ -41,7 +41,7 @@
 
 ![singleton-tic-tac-toe](singleton-tic-tac-toe.jpg)
 
-### 2. [Currying](https://chialisp.com/docs/common_functions#currying)
+### 2. [Currying](https://devs.chia.net/guides/chialisp-currying)
 
 #### Pre-commit Environment and Store State
 > เราสามารถปรับเปลี่ยน puzzle ให้เหมาะกับสถานการณ์ต่างๆกันไปโดยใช้ Currying
@@ -124,7 +124,7 @@ def get_player_from_curried_puzzle(curried_puzzle):
     return chr(player)
 ```
 
-### 4. [Aggregated Signature](https://chialisp.com/docs/security#signing-and-asserting-solution-truth) (`AGG_SIG_ME`)
+### 4. [Aggregated Signature](https://devs.chia.net/guides/chialisp-bls-signatures) (`AGG_SIG_ME`)
 
 > เหรียญเกม ทิก-แทก-โท ถูกสร้างครั้งแรกโดยเหรียญจากผู้เล่นสองคน 
 
@@ -155,7 +155,7 @@ coin_spend = CoinSpend(
 agg_sig = AugSchemeMPL.aggregate([alice_signature, bob_signature])
 ```
 
-### 5. [Spend Bundles](https://chialisp.com/docs/coin_lifecycle#spend-bundles)
+### 5. [Spend Bundles](https://docs.chia.net/spend-bundles)
 ```python
 spend_bundle = SpendBundle(
     [alice_coin_spend, bob_coin_spend], # coin spends
@@ -164,7 +164,7 @@ spend_bundle = SpendBundle(
 ```
 ![creating-coin](creating-coin.jpg)
 
-### 6. [Singleton](https://chialisp.com/docs/puzzles/singletons)
+### 6. [Singleton](https://chialisp.com/singletons)
 - [notebook](https://github.com/kimsk/chia-concepts/blob/main/notebooks/intermediate/singleton/notebook.ipynb)
 - [singleton_top_layer_v1_1.clvm](https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/singleton_top_layer_v1_1.clvm)
 - [singleton_top_layer_v1_1.py](https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/singleton_top_layer_v1_1.py)

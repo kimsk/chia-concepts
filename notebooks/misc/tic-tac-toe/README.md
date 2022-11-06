@@ -17,11 +17,11 @@ In this example, we show how to implement a simple [Tic Tac Toe](https://en.wiki
 ## Chia Concepts and Design Patterns
 Like the [counter](../counter/README.md) example, this example demonstrates the following Chia concepts and design patterns:
 
-### 1. [Outer and Inner Puzzles](https://chialisp.com/docs/common_functions#outer-and-inner-puzzles)
+### 1. [Outer and Inner Puzzles](https://devs.chia.net/guides/chialisp-inner-puzzles/)
 
 > Outer and Inner Puzzle is a very powerful design pattern as it promotes good software engineering practices such as [separation of concerns](https://en.wikipedia.org/wiki/Separation_of_concerns), [composition](https://en.wikipedia.org/wiki/Object_composition), and [unit testings](https://en.wikipedia.org/wiki/Unit_testing). 
 
-> For example, [singleton top layer puzzle](https://github.com/kimsk/chia-concepts/blob/main/notebooks/intermediate/singleton/notebook.ipynb) only concerns about maintaining [singleton rules](https://chialisp.com/docs/puzzles/singletons#design-choices) while the [tic tac toe coin puzzle](https://github.com/kimsk/chia-concepts/blob/main/notebooks/misc/tic-tac-toe/code/coin.clsp) doesn't need to know if it's wrapped inside the singleton top layer or not. 
+> For example, [singleton top layer puzzle](https://github.com/kimsk/chia-concepts/blob/main/notebooks/intermediate/singleton/notebook.ipynb) only concerns about maintaining [singleton rules](https://chialisp.com/singletons#design-decisions) while the [tic tac toe coin puzzle](https://github.com/kimsk/chia-concepts/blob/main/notebooks/misc/tic-tac-toe/code/coin.clsp) doesn't need to know if it's wrapped inside the singleton top layer or not. 
 
 > The [tic tac toe puzzle](https://github.com/kimsk/chia-concepts/blob/main/notebooks/misc/tic-tac-toe/code/tic-tac-toe.clsp) doesn't need to know if it's stand alone puzzle or if it's wrapped inside any puzzle.
 
@@ -42,7 +42,7 @@ Like the [counter](../counter/README.md) example, this example demonstrates the 
 
 ![singleton-tic-tac-toe](singleton-tic-tac-toe.jpg)
 
-### 2. [Currying](https://chialisp.com/docs/common_functions#currying)
+### 2. [Currying](https://devs.chia.net/guides/chialisp-currying)
 
 #### Pre-commit Environment and Store State
 > Currying allows us to customize the puzzle to be reused in different siutation.
@@ -123,7 +123,7 @@ def get_player_from_curried_puzzle(curried_puzzle):
     player = curried_puzzle.at("rrfrrfrfr").as_int()
     return chr(player)
 ```
-### 4. [Aggregated Signature](https://chialisp.com/docs/security#signing-and-asserting-solution-truth) (`AGG_SIG_ME`)
+### 4. [Aggregated Signature](https://devs.chia.net/guides/chialisp-bls-signatures) (`AGG_SIG_ME`)
 
 > To create a two player game, we want two players to spend their standard coins to create one tic tac toe coin.
 
@@ -154,7 +154,7 @@ coin_spend = CoinSpend(
 agg_sig = AugSchemeMPL.aggregate([alice_signature, bob_signature])
 ```
 
-### 5. [Spend Bundles](https://chialisp.com/docs/coin_lifecycle#spend-bundles)
+### 5. [Spend Bundles](https://docs.chia.net/spend-bundles)
 ```python
 spend_bundle = SpendBundle(
     [alice_coin_spend, bob_coin_spend], # coin spends
@@ -163,7 +163,7 @@ spend_bundle = SpendBundle(
 ```
 ![creating-coin](creating-coin.jpg)
 
-### 6. [Singleton](https://chialisp.com/docs/puzzles/singletons)
+### 6. [Singleton](https://chialisp.com/singletons)
 - [notebook](https://github.com/kimsk/chia-concepts/blob/main/notebooks/intermediate/singleton/notebook.ipynb)
 - [singleton_top_layer_v1_1.clvm](https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/singleton_top_layer_v1_1.clvm)
 - [singleton_top_layer_v1_1.py](https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/singleton_top_layer_v1_1.py)
