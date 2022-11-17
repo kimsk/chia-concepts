@@ -1,11 +1,18 @@
-## 
+# Decentralized Identifier (DID)
 
 `"did:" method-name ":" method-specific-id`
+## Chia DID
+`did:chia:10hq8mukapz8lml97tgnnsfdv24t9u5mw6pnqfh64kwh6vljykyrsc4m38t`
+## Notebooks
 
-`did:chia:12cclej77quuy748k6hsc6pr0skz96eqatfc4zh73hrdf8cwl4hcsvx5ukw`
+- [Create DID](./create.ipynb)
+- [DID Hint](./hints.ipynb)
+- [Get Synthetic PK](./get-synthetic-pk.ipynb)
+- [Update Metadata](./update-metadata.ipynb)
+- [Transfer DID](./transfer.ipynb)
 
-
-## Video
+## References
+### Video
 - [Introduction to Decentralized Identifiers (DID) - by Ivan Herman (W3C)](https://www.youtube.com/watch?v=t8lMCmjPKq4)
     - [slide](https://iherman.github.io/did-talks/talks/2020-Fintech/#/)
 
@@ -25,7 +32,7 @@
 - [Decentralized Identifiers (DIDs) - The Fundamental Building Block of Self Sovereign Identity](youtube.com/watch?v=Jcfy9wd5bZI)
 - [Decentralized identifiers (DIDs) fundamentals and deep dive](https://www.youtube.com/watch?v=SHuRRaOBMz4)
 
-## Misc
+### Misc
 - [Decentralized Identifiers (DIDs) v1.0](https://www.w3.org/TR/did-core/)
 - [Use Cases and Requirements for Decentralized Identifiers](https://www.w3.org/TR/did-use-cases/)
 - [DID Specification Registries](https://www.w3.org/TR/did-spec-registries/)
@@ -39,10 +46,7 @@
 
 - [namsdao](https://www.namesdao.org/)
 
-## Chia
-`did:chia:12cclej77quuy748k6hsc6pr0skz96eqatfc4zh73hrdf8cwl4hcsvx5ukw`
-
-
+### Chia
 - [ChiaLisp & Decentralized Identity](https://www.youtube.com/watch?v=zAG9KeMTZw8)
 - [DID RPCs](https://docs.chia.net/docs/12rpcs/did_rpcs)
 - [DID CLI Reference](https://docs.chia.net/docs/13cli/did_cli)
