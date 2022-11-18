@@ -255,14 +255,14 @@ The synthetic key is the key derived from:
 
 `synthetic_offset == sha256(hidden_puzzle_hash + public_key)`
 
-`synthentic_public_key == public_key + synthetic_offset_pubkey`
+`synthetic_public_key == public_key + synthetic_offset_pubkey`
 
 ![Taproot Public Key Generation](https://www.chia.net/assets/blog/Taproot-Pub-Key-Generation.png)
 > The image is from [Aggregated Signatures, Taproot, Graftroot, and Standard Transactions](https://www.chia.net/2021/05/27/Agrgregated-Sigs-Taproot-Graftroot.html)
 
 There are two ways to spend the standard transaction:
 
-1. Signing a delegated puzzle and its solution with `synthentic_private_key`
+1. Signing a delegated puzzle and its solution with `synthetic_private_key`
 
 ```lisp
 (SYNTHETIC_PUBLIC_KEY _public_key delegated_puzzle solution)
@@ -280,7 +280,7 @@ There are two ways to spend the standard transaction:
 ...
 (if (=
         SYNTHETIC_PUBLIC_KEY
-        (point_add ; synthentic_public_key == public_key + synthetic_offset_pubkey
+        (point_add ; synthetic_public_key == public_key + synthetic_offset_pubkey
             public_key
             (pubkey_for_exp ( ; derive public key offset from synthetic_offset 
                     ; synthetic_offset == sha256(hidden_puzzle_hash + public_key)

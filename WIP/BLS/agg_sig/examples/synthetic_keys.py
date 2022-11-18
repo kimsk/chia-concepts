@@ -19,7 +19,7 @@ synthetic_offset: int = calculate_synthetic_offset(pk1, DEFAULT_HIDDEN_PUZZLE_HA
 
 # https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/p2_delegated_puzzle_or_hidden_puzzle.py#L48
 # https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/puzzles/calculate_synthetic_public_key.clvm
-# synthentic_public_key = original_public_key + synthetic_offset_pubkey
+# synthetic_public_key = original_public_key + synthetic_offset_pubkey
 # (point_add public_key (pubkey_for_exp (sha256 public_key hidden_puzzle_hash)))
 # https://chialisp.com/docs/ref/clvm#bls12-381-operators
 synthetic_pk: G1Element = calculate_synthetic_public_key(pk1, DEFAULT_HIDDEN_PUZZLE_HASH)
