@@ -33,25 +33,21 @@ src/compiler <-- a newer compiler (ochialisp) with a simpler
 (2 (1 16 5 11) (4 (1) 1))
 ```
 ```clojure
-(a (q 16 5 11) (q (q) 1))
+(a (q + 5 11) (q (1) 1))
 ```
 
 ```sh
-❯ brun '(a (q 16 5 11) (c (q) 1))' '(30 12)'
+❯ brun '(a (q + 5 11) (c (1) 1))' '(30 12)'
 42
 
-❯ brun '(a (q 16 5 11) (c (q) (q . (30 12))))'
-42
-
-❯ brun '(a (q 16 5 11) (c (q . (30 12)) (q . (30 12))))'
-42
-
-# 16 is op_add
-❯ brun '(a (q + 5 11) (c (q . (30 12)) (q . (30 12))))'               
+❯ brun '(a (q + 5 11) (c (q . (30 12)) (q . (30 12))))'
 42
 
 ❯ brun '(c (q . (30 12)) (q . (30 12))))'                             
 ((pubkey_for_exp 12) 30 12)
+
+❯ brun '(a (q + 5 11) (q . ((30 12) 30 12)))'
+42
 
 # pubkey_for_exp is 30
 # 5 is (f (r 1)) 
