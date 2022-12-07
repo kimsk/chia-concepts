@@ -46,10 +46,10 @@ src/compiler <-- a newer compiler (ochialisp) with a simpler
 ❯ brun '(c (q . (30 12)) (q . (30 12))))'                             
 ((pubkey_for_exp 12) 30 12)
 
+# 30 is pubkey_for_exp
 ❯ brun '(a (q + 5 11) (q . ((30 12) 30 12)))'
 42
 
-# pubkey_for_exp is 30
 # 5 is (f (r 1)) 
 ❯ brun '5' '((30 12) 30 12)'
 30
