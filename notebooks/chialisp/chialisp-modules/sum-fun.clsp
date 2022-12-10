@@ -1,0 +1,4 @@
+(mod (a b c)
+    (include modules.clib)
+    (sum-fun 0 (list a b c))
+)

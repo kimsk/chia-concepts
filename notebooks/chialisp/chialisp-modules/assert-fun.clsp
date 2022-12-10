@@ -1,0 +1,9 @@
+(mod (a b c d)
+    (include modules.clib)
+    (assert-fun (list a b c d))
+)
+
+;(a 
+;    (i 2 (q 2 (i 5 (q 2 (i 11 (q . 23) (q 8 (q . "ERROR"))) 1) (q 8 (q . "ERROR"))) 1) (q 8 (q . "ERROR")))
+;    1
+;)

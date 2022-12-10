@@ -1,0 +1,36 @@
+(
+    ; "assert" is a macro that wraps repeated instances of "if"
+    ; usage: (assert A0 A1 ... An R)
+    ; all of A0, A1, ... An must evaluate to non-null, or an exception is raised
+    ; return the value of R (if we get that far)
+    (defmacro assert items
+        (if (r items)
+            (list if (f items) (c assert (r items)) (q . (x)))
+            (f items)
+        )
+    )
+
+    ;; boolean and macro
+    ;; This lets you write something like (if (and COND1 COND2 COND3) (do-something) (do-something-else))
+    (defmacro and ARGS
+        (if ARGS
+            (qq (if (unquote (f ARGS))
+                (unquote (c and (r ARGS)))
+                ()
+                ))
+            1)
+    )
+
+    ;; boolean or macro
+    ;; This lets you write something like (if (or COND1 COND2 COND3) (do-something) (do-something-else))
+    ;; Defines a macro that can manually structure the source code it is replaced with. 
+    ;; Allows for advanced compile time behavior.
+    (defmacro or ARGS
+        (if ARGS
+            (qq (if (unquote (f ARGS))
+                1
+                (unquote (c or (r ARGS)))
+            ))
+        0)
+    )
+)

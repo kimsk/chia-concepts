@@ -1,0 +1,4 @@
+(mod (a b c d)
+    (include modules.clib)
+    (assert-macro a b c d)
+)

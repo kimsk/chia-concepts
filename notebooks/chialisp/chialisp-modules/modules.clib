@@ -1,0 +1,74 @@
+(
+    (defun cons_a-fun (items)
+        (c "a" items)
+    )
+
+    (defmacro cons_a-macro (items)
+        (qq 
+            (c "a" (unquote items))
+        )
+    )
+
+    (defun add-fun (A B) 
+        (+ A B)
+    )
+
+    (defun-inline add-inline (A B) 
+        (+ A B)
+    )
+
+    (defmacro add-macro (A B) 
+        (qq 
+            (+ (unquote A) (unquote B))
+        )
+    )
+
+    (defun sum-fun (n items)
+        (if (r items)
+            (sum-fun (+ (f items) n) (r items))
+            (+ (f items) n)
+        ) 
+    )
+
+    (defun assert-fun (items)
+        (if (r items)
+            (if (f items) 
+                (assert-fun (r items)) 
+                (x "ERROR")
+            )
+            (if (f items)
+                (f items)
+                (x "ERROR")
+            ) 
+        )
+    )
+
+    (defmacro assert-macro items
+        (if (r items)
+            (list 
+                if (f items) 
+                    (c assert-macro (r items)) 
+                    (q . (x "ERROR"))
+            )
+            (f items)
+        )
+    )
+
+    (defmacro and-macro ARGS
+        (if ARGS
+            (qq (if (unquote (f ARGS))
+                (unquote (c and-macro (r ARGS)))
+                ()
+                ))
+            1)
+    )
+
+    (defmacro or-macro ARGS
+        (if ARGS
+            (qq (if (unquote (f ARGS))
+                1
+                (unquote (c or-macro (r ARGS)))
+            ))
+        0)
+    )
+)
