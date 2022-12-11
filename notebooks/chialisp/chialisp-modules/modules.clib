@@ -30,6 +30,16 @@
         ) 
     )
 
+    (defmacro sum-macro items
+        (if (r items)
+            (list 
+                + (f items) 
+                  (c sum-macro (r items))
+            )
+            (f items)
+        )
+    )
+
     (defun assert-fun (items)
         (if (r items)
             (if (f items) 
