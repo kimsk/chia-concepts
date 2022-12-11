@@ -14,11 +14,14 @@
     ;; This lets you write something like (if (and COND1 COND2 COND3) (do-something) (do-something-else))
     (defmacro and ARGS
         (if ARGS
-            (qq (if (unquote (f ARGS))
-                (unquote (c and (r ARGS)))
-                ()
-                ))
-            1)
+            (qq 
+                (if (unquote (f ARGS))
+                    (unquote (c and (r ARGS)))
+                    ()
+                )
+            )
+            1
+        )
     )
 
     ;; boolean or macro
@@ -27,10 +30,13 @@
     ;; Allows for advanced compile time behavior.
     (defmacro or ARGS
         (if ARGS
-            (qq (if (unquote (f ARGS))
-                1
-                (unquote (c or (r ARGS)))
-            ))
-        0)
+            (qq 
+                (if (unquote (f ARGS))
+                    1
+                    (unquote (c or (r ARGS)))
+                )
+            )
+            0
+        )
     )
 )

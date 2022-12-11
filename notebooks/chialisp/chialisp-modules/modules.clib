@@ -1,11 +1,11 @@
 (
-    (defun cons_a-fun (items)
-        (c "a" items)
+    (defun cons_42-fun (items)
+        (c "*" items)
     )
 
-    (defmacro cons_a-macro (items)
+    (defmacro cons_42-macro (items)
         (qq 
-            (c "a" (unquote items))
+            (c "*" (unquote items))
         )
     )
 
@@ -32,7 +32,7 @@
 
     (defmacro sum-macro items
         (if (r items)
-            (list 
+            (list
                 + (f items) 
                   (c sum-macro (r items))
             )
