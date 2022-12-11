@@ -23,10 +23,10 @@
         )
     )
 
-    (defun sum-fun (n items)
+    (defun sum-fun (items)
         (if (r items)
-            (sum-fun (+ (f items) n) (r items))
-            (+ (f items) n)
+            (+ (f items) (sum-fun (r items)))
+            (f items)
         ) 
     )
 
@@ -57,18 +57,23 @@
     (defmacro and-macro ARGS
         (if ARGS
             (qq (if (unquote (f ARGS))
-                (unquote (c and-macro (r ARGS)))
-                ()
-                ))
-            1)
+                    (unquote (c and-macro (r ARGS)))
+                    ()
+                )
+            )
+            1
+        )
     )
 
     (defmacro or-macro ARGS
         (if ARGS
-            (qq (if (unquote (f ARGS))
-                1
-                (unquote (c or-macro (r ARGS)))
-            ))
-        0)
+            (qq 
+                (if (unquote (f ARGS))
+                    1
+                    (unquote (c or-macro (r ARGS)))
+                )
+            )
+            0
+        )
     )
 )
