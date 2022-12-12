@@ -28,8 +28,18 @@ pip install jupyterlab_sos
 ## Notebooks
 - [Example](./notebooks/example.ipynb)
 
+### Chialisp
+- [Dive into CLVM](notebooks/chialisp/clvm/dive-into-CLVM.ipynb)
+- [Map/Reduce/Filter](notebooks/chialisp/map-reduce-filter/notebook.ipynb)
+    - [using Lambda](notebooks/chialisp/map-reduce-filter/lambda.ipynb)
+- [Modules](notebooks/chialisp/chialisp-modules/notebook.ipynb)
+
+- [apply](notebooks/chialisp/apply/README.md)
+- [op_code](notebooks/chialisp/op_code/README.md)
+- [quote](notebooks/chialisp/quote/README.md)
+- [standard-cl-21](notebooks/chialisp/standard-cl-21/README.md)
+
 ### Misc 
-- [Dive into CLVM](notebooks/misc/dive-into-CLVM.ipynb)
 - [Automatic Counter](notebooks/misc/counter/README.md)
     - [Normal Coin](notebooks/misc/counter/create-coin.ipynb)
     - [Singleton Counter](notebooks/misc/counter/singleton-counter.ipynb)
@@ -40,7 +50,6 @@ pip install jupyterlab_sos
 - [Coins](notebooks/basic/coins/notebook.ipynb)
 - [Merkel Tree]
 - [Outer and Inner Puzzle](/notebooks/basic/outer-and-inner-puzzles/notebook.ipynb)
-- [Map/Reduce/Filter](notebooks/basic/map-reduce-filter/notebook.ipynb)
 ### Intermediate
 - [DIDs](notebooks/intermediate/dids/README.md)
 - [Singleton](notebooks/intermediate/singleton/notebook.ipynb)

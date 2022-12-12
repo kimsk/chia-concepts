@@ -1,0 +1,4 @@
+(mod (a b c d)
+    (include modules.clib)
+    (add-fun a b)
+)
