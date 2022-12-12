@@ -1,0 +1,55 @@
+(
+    (defun map (fn lst)
+        (if lst
+            (c
+                (a fn (f lst))
+                (map fn (r lst))
+            )
+            () 
+        )
+    )
+
+    (defun reduce_ (fn acc lst)
+        (if lst
+            (reduce_ fn
+                (a fn (list acc (f lst)))
+                (r lst)
+            )
+            acc
+        )
+    )
+
+    (defun reduce (fn lst)
+        (reduce_ fn (f lst) (r lst))
+    )
+
+    (defun rev (acc lst)
+        (if lst
+            (rev (c (f lst) acc) (r lst))
+            acc
+        )
+    )
+
+    (defun filter_ (fn acc lst)
+        (if lst
+            (filter_ fn
+                (if (a fn (f lst))
+                    (c
+                        (f lst)
+                        acc
+                    )
+                    acc
+                )
+                (r lst) 
+            )
+            acc
+        )
+    )
+
+    (defun filter (fn input_list)
+        (rev
+            ()
+            (filter_ fn () input_list)
+        )
+    )
+)

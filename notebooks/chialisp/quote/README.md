@@ -85,4 +85,7 @@
 # (+ 1 2) is evaluated to 3
 ❯ run '(qq (+ 5 (unquote (+ 1 2))))'
 (+ 5 3)
+
+❯ run '(f (qq (unquote @)))' '(5 2 3 4)'
+5
 ```
