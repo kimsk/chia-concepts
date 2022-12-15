@@ -1,16 +1,4 @@
-; FN (acc lst)
-(mod (FN . input_list)
-    (defun rec (FN acc lst)
-        (if lst
-            (rec FN
-                (a FN (list acc (f lst)))
-                (r lst)
-            )
-            acc
-        )
-    )
-    (rec FN
-        (f input_list) 
-        (r input_list)
-    )
+(mod (fn . lst)
+    (include libs.clib)
+    (reduce fn lst)
 )
