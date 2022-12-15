@@ -1,0 +1,52 @@
+(mod (v1 v2 v3)
+    (defun map-fun (fn input)
+        (if input
+            (c  (a fn (f input))
+                (map-fun fn (r input))
+            )
+            ()
+        )
+    )
+    (defmacro map-macro-work input
+        (if (r input)
+            (list
+                c (f input) 
+                  (c map-macro (r input))
+            )
+            (qq (c (unquote (f input)) ()))
+        )
+    )
+    (defmacro map-macro input
+        (if (r (r input))
+            (list
+                c (a (f input) (f (r input))) 
+                  (qq (c map-macro (unquote (f input)) (r (r input))))
+            )
+            (qq (c (unquote (a (f input) (f (r input)))) ()))
+        )
+    )
+    (defun-inline ffn (v) (* v v))
+    ;(map-fun (lambda v (+ v v)) (list v1 v2 v3))
+    ;(map-macro (lambda v (+ v v)) v1 v2 v3)
+    (map-macro-work v1 v2 v3)
+    ;(defun map (fn lst)
+    ;    (if lst
+    ;        (c
+    ;            (a fn (f lst))
+    ;            (map fn (r lst))
+    ;        )
+    ;        () 
+    ;    )
+    ;)
+
+    ;(defun apply (fn lst)
+    ;    (a fn lst)
+    ;)
+
+    ;(apply (lambda (n1 n2) (+ n1 n2)) (list v1 v2))
+    ;(apply (q . (+ 2 5)) (list v1 v2))
+    ;(map (q . (+ 1 1)) (list v1 v2))
+    ;(map (lambda n (+ n n)) (list v1 v2))
+    ;(a (q . (+ 2 5)) (list v1 v2))
+    ;(a (lambda (n1 n2) (+ n1 n2)) (list v1 v2))
+)
