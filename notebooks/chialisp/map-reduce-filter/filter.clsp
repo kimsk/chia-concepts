@@ -1,4 +1,34 @@
 (mod (fn . lst)
-    (include libs.clib) 
+
+    (defun rev (acc lst)
+        (if lst
+            (rev (c (f lst) acc) (r lst))
+            acc
+        )
+    )
+
+    (defun filter_ (fn acc lst)
+        (if lst
+            (filter_ fn
+                (if (a fn (f lst))
+                    (c
+                        (f lst)
+                        acc
+                    )
+                    acc
+                )
+                (r lst) 
+            )
+            acc
+        )
+    )
+
+    (defun filter (fn input_list)
+        (rev
+            ()
+            (filter_ fn () input_list)
+        )
+    )
+
     (filter fn lst)
 )

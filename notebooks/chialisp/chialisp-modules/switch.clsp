@@ -1,0 +1,26 @@
+(mod input
+    (defmacro switch code
+        (if (r (r code))
+            (list if (qq (= (unquote (f code)) (unquote (f (f (r code))))))
+                (r (f (r code)))
+                (c switch (c (f code) (r (r code))))
+            )
+            ; last case is default
+            (r (f (r code)))
+        )
+    )
+
+    (defun-inline case-a (amount)
+        (* 1000 amount)
+    )
+
+    (defun-inline case-b (amount)
+        (* 2000 amount)
+    )
+ 
+    (switch input
+        ("A" case-a 20) 
+        ("B" case-b 21) 
+        ("default" case-b -1)
+    )
+)

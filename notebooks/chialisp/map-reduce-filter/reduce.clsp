@@ -1,4 +1,18 @@
 (mod (fn . lst)
-    (include libs.clib)
+
+    (defun reduce_ (fn acc lst)
+        (if lst
+            (reduce_ fn
+                (a fn (list acc (f lst)))
+                (r lst)
+            )
+            acc
+        )
+    )
+
+    (defun reduce (fn lst)
+        (reduce_ fn (f lst) (r lst))
+    )    
+    
     (reduce fn lst)
 )

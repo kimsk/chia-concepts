@@ -1,4 +1,14 @@
 (mod (fn . lst)
-    (include libs.clib)
+
+    (defun map (fn lst)
+        (if lst
+            (c
+                (a fn (f lst))
+                (map fn (r lst))
+            )
+            () 
+        )
+    )
+
     (map fn lst)
 )

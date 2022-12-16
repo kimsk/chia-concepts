@@ -1,0 +1,17 @@
+(mod (v1 v2 v3 v4)
+
+    ; square function
+    (defun-inline sqr (v) (* v v))
+
+    (defun map (lst)
+        (if lst
+            (c
+                (sqr (f lst))
+                (map (r lst))
+            )
+            ()
+        )
+    )
+
+    (map (list v1 v2 v3 v4))
+)
