@@ -1,4 +1,11 @@
 (mod (a b c d)
-    (include modules.clib)
-    (sum-fun (list a b c d))
+
+    (defun sum (items)
+        (if (r items)
+            (+ (f items) (sum (r items)))
+            (f items)
+        ) 
+    )
+
+    (sum (list a b c d))
 )

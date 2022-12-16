@@ -1,13 +1,17 @@
-(mod (v1 v2 v3)
+(mod (v1 v2 v3 v4)
+
+    ; square function
+    (defun-inline sqr (v) (* v v))
+
     (defmacro map input
         (if (r input)
             (list
-                c (qq (fn (unquote (f input))))
+                c (qq (sqr (unquote (f input))))
                   (c map (r input))
             )
-            (qq (c (fn (unquote (f input))) ()))
+            (qq (c (sqr (unquote (f input))) ()))
         )
     )
-    (defun-inline fn (v) (* v v))
-    (map v1 v2 v3)
+
+    (map v1 v2 v3 v4)
 )

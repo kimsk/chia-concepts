@@ -1,4 +1,14 @@
-(mod (a b c d)
-    (include modules.clib)
-    (sum-macro a b c d)
+(mod (a b c d e)
+
+    (defmacro sum items
+        (if (r items)
+            (list
+                + (f items) 
+                  (c sum (r items))
+            )
+            (f items)
+        )
+    )    
+    
+    (sum a b c d e)
 )
