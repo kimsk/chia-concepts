@@ -1,4 +1,4 @@
-(mod (a b c d e)
+(mod (a b c d)
 
     (defmacro sum items
         (if (r items)
@@ -10,5 +10,5 @@
         )
     )    
     
-    (sum a b c d e)
+    (sum a b c d)
 )
