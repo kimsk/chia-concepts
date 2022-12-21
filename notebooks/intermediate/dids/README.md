@@ -3,6 +3,17 @@
 `"did:" method-name ":" method-specific-id`
 ## Chia DID
 `did:chia:10hq8mukapz8lml97tgnnsfdv24t9u5mw6pnqfh64kwh6vljykyrsc4m38t`
+
+```sh
+❯ cdv decode did:chia:10hq8mukapz8lml97tgnnsfdv24t9u5mw6pnqfh64kwh6vljykyrsc4m38t
+7dc07df2dd088ffdfcbe5a273825ac55565e536ed06604df55b3afa67e44b107
+```
+`7dc07df2dd088ffdfcbe5a273825ac55565e536ed06604df55b3afa67e44b107` is a launcher coin name (e.g., coin id).
+
+https://twitter.com/kimsk/status/1566728274893742083
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">gm <a href="https://twitter.com/hashtag/chialisper?src=hash&amp;ref_src=twsrc%5Etfw">#chialisper</a> <br>Fun Facts about <a href="https://twitter.com/hashtag/bech32m?src=hash&amp;ref_src=twsrc%5Etfw">#bech32m</a> and <a href="https://twitter.com/hashtag/Chia?src=hash&amp;ref_src=twsrc%5Etfw">#Chia</a><br><br>1. XCH address is a bech32m encoded of the coin’s puzzle hash.<br>2. NFT Id is a bech32m encoded of the NFT launcher coin id.<br>3. DID is a bech32m encoded of the DID launcher coin id.</p>&mdash; 🌱karlkim.xch🌱 (@kimsk) <a href="https://twitter.com/kimsk/status/1566728274893742083?ref_src=twsrc%5Etfw">September 5, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
 ## Notebooks
 
 - [Create DID](./create.ipynb)
