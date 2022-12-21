@@ -64,4 +64,4 @@ https://twitter.com/kimsk/status/1593458381188395008
 - [DID RPCs](https://docs.chia.net/docs/12rpcs/did_rpcs)
 - [DID CLI Reference](https://docs.chia.net/docs/13cli/did_cli)
 - [DIDs](https://chialisp.com/dids)
-- [generate_new_decentralised_id](https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/did_wallet/did_wallet.py#L1108)
+- [generate_new_decentralised_id](https://github.com/Chia-Network/chia-blockchain/blob/1d428867218a04bc0a510196297a1451f23aec3a/chia/wallet/did_wallet/did_wallet.py#L1220)
