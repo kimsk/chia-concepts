@@ -27,7 +27,7 @@ All tails need 5 arguments:
 
 CAT Truths is: ((Inner puzzle hash . (MOD hash . (MOD hash hash . TAIL hash))) . (my_id . (my_parent_info my_puzhash my_amount)))
 
-#### Single-Issuance TAIL
+#### Single-Issuance TAIL (genesis_by_coin_id)
 
 > The single-issuance TAIL prevents melting and requires the parent to be a specific coin. This is currently the default way to issue CATs, since it ensures the supply will never increase.
 
@@ -39,7 +39,8 @@ CAT Truths is: ((Inner puzzle hash . (MOD hash . (MOD hash hash . TAIL hash))) .
 - `inner_conditions`
 
 
-[genesis_by_coin_id](./references/genesis_by_coin_id.clsp)
+[genesis_by_coin_id](./reference_tails/genesis_by_coin_id.clsp)
+[genesis_by_coin_id notebook](./genesis_by_coin_id.ipynb)
 ```clojure
 (mod (
       GENESIS_ID
@@ -60,17 +61,37 @@ CAT Truths is: ((Inner puzzle hash . (MOD hash . (MOD hash hash . TAIL hash))) .
           (x)
         )
     )
-
 )
 ```
 
 
 #### Multi-Issuance TAIL
 
-[delegated_tail.clsp](./references/delegated_tail.clsp)
-
+##### [everything_with_signature.clsp](./reference_tails/everything_with_signature.clsp)
 ```clojure
-(
+(mod (
+      PUBKEY
+      Truths
+      parent_is_cat
+      lineage_proof
+      delta
+      inner_conditions
+      _
+    )
+
+    (include condition_codes.clib)
+
+    (list (list AGG_SIG_ME PUBKEY delta)) ; Careful with a delta of zero, the bytecode is 80 not 00
+)
+```
+
+
+##### [delegated_tail.clsp](./reference_tails/delegated_tail.clsp)
+[delegated_tail notebook](./delegated_tail.ipynb)
+- Need valid signature for `PUBKEY` and `delegated_puzzle` hash.
+- Allow flexible `delegated_puzzle` to be run.
+```clojure
+(mod (
       PUBKEY
       Truths
       parent_is_cat
@@ -82,17 +103,21 @@ CAT Truths is: ((Inner puzzle hash . (MOD hash . (MOD hash hash . TAIL hash))) .
         delegated_solution
       )
     )
+
+    (include condition_codes.clib)
+
+    (defun sha256tree1 (TREE)
+          (if (l TREE)
+              (sha256 2 (sha256tree1 (f TREE)) (sha256tree1 (r TREE)))
+              (sha256 1 TREE)))
+
+    (c (list AGG_SIG_UNSAFE PUBKEY (sha256tree1 delegated_puzzle))
+      (a delegated_puzzle (c Truths (c parent_is_cat (c lineage_proof (c delta (c inner_conditions delegated_solution))))))
+    )
+)
 ```
 
-- Need valid signature for `PUBKEY` and `delegated_puzzle` hash.
-- Allow flexible `delegated_puzzle` to be run.
-```clojure
-(AGG_SIG_UNSAFE PUBKEY (sha256tree1 delegated_puzzle))
-(
-     a 
-     delegated_puzzle 
-     (c Truths (c parent_is_cat (c lineage_proof (c delta (c inner_conditions delegated_solution)))))
-)
+##### [genesis_by_puzzle_hash_with_0.clsp](./reference_tails/genesis_by_puzzle_hash_with_0.clsp)
 
 ```
 
