@@ -6,10 +6,13 @@ from rich.syntax import Syntax
 
 from chia.consensus.default_constants import DEFAULT_CONSTANTS
 from chia.types.blockchain_format.program import Program
+from chia.types.spend_bundle import SpendBundle
+from chia.util.bech32m import bech32_decode, convertbits
 from chia.util.condition_tools import conditions_for_solution
-from clvm.casts import int_to_bytes
+from chia.wallet.util.puzzle_compression import decompress_object_with_puzzles
 from clvm_tools.binutils import disassemble
 from clvm_tools.clvmc import compile_clvm_text
+from clvm.casts import int_to_bytes
 
 
 def load_program(file_path, search_paths):
@@ -18,7 +21,7 @@ def load_program(file_path, search_paths):
         compile_clvm_text(clsp, search_paths)
     )
 
-def load_hex(file_path, search_paths):
+def load_hex(file_path):
     hex_str = Path(file_path).read_text()
     return Program.fromhex(hex_str)
 
@@ -80,3 +83,23 @@ def print_push_tx_result(result):
 
 def print_json(dict):
     print(json.dumps(dict, sort_keys=True, indent=4))
+
+def print_offer(offer_hex: str):
+    hrpgot, data = bech32_decode(offer_hex, max_length=len(offer_hex))
+    if hrpgot != 'offer':
+        raise ValueError('hex string is not an offer')
+    
+    decoded = convertbits(list(data), 5, 8, False)
+    decoded_bytes = bytes(decoded)
+    decompressed_bytes = decompress_object_with_puzzles(decoded_bytes)
+    bundle = SpendBundle.from_bytes(decompressed_bytes)
+
+    for csp in bundle.coin_solutions:
+        coin = csp.coin
+        puzzle = csp.puzzle_reveal.to_program()
+        solution = csp.solution.to_program()
+        print(coin)
+        if coin.amount == 0:
+            continue
+        print(coin.name().hex())
+        print_conditions(puzzle, solution)
