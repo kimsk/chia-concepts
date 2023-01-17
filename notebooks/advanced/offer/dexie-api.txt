@@ -1,0 +1,3 @@
+https://testnet.dexie.space/api
+
+curl "https://api-testnet.dexie.space/v1/offers?requested=TXCH&status=4&page_size=5&page=1" | jq "{offer: .offers[].offer, id: .offers[].id}"
