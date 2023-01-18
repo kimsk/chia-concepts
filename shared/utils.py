@@ -6,18 +6,29 @@ from rich.syntax import Syntax
 
 from chia.consensus.default_constants import DEFAULT_CONSTANTS
 from chia.types.blockchain_format.program import Program
+from chia.types.blockchain_format.sized_bytes import bytes32
 from chia.types.condition_opcodes import ConditionOpcode
 from chia.types.condition_with_args import ConditionWithArgs
 from chia.types.spend_bundle import SpendBundle
 from chia.util.bech32m import bech32_decode, convertbits
 from chia.util.condition_tools import (conditions_for_solution, parse_sexp_to_condition)
 from chia.wallet.payment import Payment
+from chia.wallet.puzzles.cat_loader import CAT_MOD
 from chia.wallet.trading.offer import Offer
 from chia.wallet.util.puzzle_compression import decompress_object_with_puzzles
 from clvm_tools.binutils import disassemble
 from clvm_tools.clvmc import compile_clvm_text
 from clvm.casts import int_to_bytes
 
+def get_cat_puzzlehash(asset_id: bytes32, inner_puzzlehash: bytes32):
+    outer_puzzlehash = CAT_MOD.curry(
+        CAT_MOD.get_tree_hash(),
+        asset_id,
+        inner_puzzlehash
+    ).get_tree_hash_precalc(
+        inner_puzzlehash
+    )
+    return outer_puzzlehash
 
 def load_program(file_path, search_paths):
     clsp = Path(file_path).read_text()
