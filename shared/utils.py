@@ -20,6 +20,13 @@ from clvm_tools.binutils import disassemble
 from clvm_tools.clvmc import compile_clvm_text
 from clvm.casts import int_to_bytes
 
+def get_offer_version(offer_hex):
+    hrpgot, data = bech32_decode(offer_hex, max_length=len(offer_hex))
+    decoded = convertbits(list(data), 5, 8, False)
+    decoded_bytes = bytes(decoded)
+    version = int.from_bytes(decoded_bytes[0:2], "big")
+    return version
+
 def get_cat_puzzlehash(asset_id: bytes32, inner_puzzlehash: bytes32):
     outer_puzzlehash = CAT_MOD.curry(
         CAT_MOD.get_tree_hash(),
@@ -98,15 +105,21 @@ def print_offer(offer: Offer):
             
     # conditions from bundle
     bundle = offer.bundle
-    print("CoinSpend:")
+    print("\nCoinSpend:")
     for csp in bundle.coin_spends:
+        puzzle = csp.puzzle_reveal.to_program()
+        solution = csp.solution.to_program()
         print("Coin:")
         print(csp.coin.name().hex())
         print(csp.coin)
+        print("\nPuzzle")
+        print_program(puzzle)
+        print("\nSolution")
+        print_program(solution)
         print("\nConditions")
-        print_conditions(csp.puzzle_reveal.to_program(), csp.solution.to_program())
+        print_conditions(puzzle, solution)
     
-    print("\nAdditions:")
+    print("\n\nAdditions:")
     for c in bundle.additions():
         print(c)
 
